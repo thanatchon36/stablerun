@@ -3,6 +3,7 @@
 
   python scripts/run_all.py --experiment all          # E1 (A and B), E2, E3, E4, E5, benchmark, figures, tables (~25 min on 1 CPU)
   python scripts/run_all.py --experiment E1 --issuer B
+  python scripts/run_all.py --experiment validate     # re-run the two calibration episodes: validation table and Figure F4
   python scripts/run_all.py --experiment calibrate    # re-fit and patch config/params_default.yaml in place
   (cd paper && latexmk -pdf main.tex)                 # build the paper
 """
@@ -18,7 +19,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from stablerun.config import load_config, with_overrides  # noqa: E402
 
-CHOICES = ["E1", "E2", "E3", "E4", "E5", "benchmark", "figures", "tables", "calibrate", "all"]
+CHOICES = ["E1", "E2", "E3", "E4", "E5", "benchmark", "validate", "figures", "tables", "calibrate", "all"]
 
 
 def main() -> None:
@@ -35,7 +36,7 @@ def main() -> None:
     if a.impact:
         cfg = with_overrides(cfg, {"bill_market": {"impact": {"functional_form": a.impact}}})
     out = Path(a.out) if a.out else ROOT / "results"
-    steps = [a.experiment] if a.experiment != "all" else ["E1", "E2", "E3", "E4", "E5", "benchmark", "figures", "tables"]
+    steps = [a.experiment] if a.experiment != "all" else ["E1", "E2", "E3", "E4", "E5", "benchmark", "validate", "figures", "tables"]
     for step in steps:
         if step == "calibrate":
             from stablerun.calibrate import run_calibration
@@ -64,6 +65,9 @@ def main() -> None:
         elif step == "benchmark":
             from stablerun.experiments2 import run_benchmark
             run_benchmark(cfg, out)
+        elif step == "validate":
+            from stablerun.calibrate import run_validation
+            run_validation(cfg, out, n_paths_final=a.paths or 300)
         elif step == "figures":
             import pandas as pd
             from stablerun.plots2 import figure_f2, figure_f3, figure_f5, figure_f6
@@ -71,7 +75,7 @@ def main() -> None:
             figure_f2(pd.read_csv(T / "E2_tipping_point.csv"), F / "F2_tipping_point")
             figure_f3(pd.read_csv(T / "E3_policy_grid.csv"), F / "F3_policy_heatmaps")
             figure_f5(pd.read_csv(T / "E5_sensitivity.csv"), F / "F5_sensitivity_tornado")
-            figure_f6(pd.read_csv(T / "benchmark_check.csv"), F / "F6_benchmark_check")
+            figure_f6(pd.read_csv(T / "benchmark_check.csv"), F / "F6_benchmark_check", cfg=cfg)
         elif step == "tables":
             subprocess.run([sys.executable, str(ROOT / "scripts" / "make_tables.py")], check=True)
             for f in (out / "figures").glob("*.pdf"):

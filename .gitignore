@@ -17,3 +17,5 @@ paper/main.pdf
 results/tables/*_paths.csv
 results/phase3.log
 paper/arxiv.tar.gz
+.venv/
+.tools/

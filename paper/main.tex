@@ -7,19 +7,43 @@
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs,array}
+\usepackage{adjustbox}
 \usepackage[round]{natbib}
-\usepackage[font=small,labelfont=bf,labelsep=period,justification=justified]{caption}
+\usepackage[font=small,labelfont=bf,labelsep=period,justification=justified,skip=6pt]{caption}
 \usepackage{placeins}
 \usepackage{float}
 \usepackage{fancyhdr}
 \usepackage{titlesec}
 \usepackage{xcolor}
-\usepackage[colorlinks=true,linkcolor=navy,citecolor=navy,urlcolor=navy]{hyperref}
+\usepackage[colorlinks=true,linkcolor=navy,citecolor=navy,urlcolor=navy,bookmarksnumbered=true]{hyperref}
 \definecolor{navy}{RGB}{0,51,102}
-\renewcommand{\arraystretch}{1.12}
+\hypersetup{pdftitle={When Stablecoins Run: Fire-Sale Spillovers to the Treasury Bill Market},
+            pdfauthor={Thanatchon Chongmankhong},
+            pdfsubject={An agent-based stress test of stablecoin runs and the Treasury bill market},
+            pdfkeywords={stablecoins, Treasury bills, bank runs, fire sales, agent-based models, financial stability}}
 \graphicspath{{figures/}}
 \newcommand{\bn}{\textrm{bn}}
 \newcommand{\bp}{\textrm{bp}}
+
+% tables: booktabs rules, slightly open rows, no vertical rules
+\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{5pt}
+
+% floats: a large figure may share its page with text instead of taking a page of its own,
+% and a float page starts at the top
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.8}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{4}
+\makeatletter\setlength{\@fptop}{0pt}\makeatother
+
+% paragraphs and the reference list
+\widowpenalty=10000
+\clubpenalty=10000
+\renewcommand{\bibfont}{\small}
+\setlength{\bibsep}{3pt plus 1pt}
 
 % section headings
 \titleformat{\section}{\large\bfseries}{\thesection.}{0.6em}{}

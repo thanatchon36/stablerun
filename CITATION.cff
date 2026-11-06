@@ -13,7 +13,7 @@ authors:
   - family-names: Chongmankhong
     given-names: Thanatchon
 version: 0.3.0
-date-released: 2026-11-05
+date-released: 2026-11-06
 license: MIT
 repository-code: "https://github.com/thanatchon36/stablerun"
 keywords: [stablecoins, treasury-bills, fire-sales, agent-based-model, financial-stability, stress-testing]

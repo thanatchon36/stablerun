@@ -20,16 +20,17 @@ $\eta=0.1$, threshold scale~1, $w_1=0.5$, $\psi=1$, a feared USDT exposure of 2\
 supply per day for Issuer~A and 3\% for Issuer~B, and arbitrage capital of 1.1\% and 3\% of supply per day.
 
 \begin{table}[tbp]\centering\small
-\caption{Validation against the two calibration episodes (300 paths, 10{,}000 agents). $z$ is the model minus the
-observed value in units of the tolerance. All observed values are to be verified.}\label{tab:validation}
-\resizebox{\textwidth}{!}{\input{tables/validation}}
+\caption{Validation against the two calibration episodes (300 paths, 10{,}000 agents). ``Observed'' is the target
+with its tolerance; $z$ is the model minus the observed value in units of the tolerance; days are business days.
+All observed values are to be verified.}\label{tab:validation}
+\adjustbox{max width=\textwidth}{\input{tables/validation}}
 \end{table}
 
 \begin{figure}[tbp]\centering
 \includegraphics[width=\textwidth]{F4_validation}
 \caption{Validation. Model paths (median, interquartile range and 5--95\% band) for the token price and cumulative
-redemptions in the two calibration episodes, against the observed trough range and redemption targets (to be
-verified).}\label{fig:f4}
+redemptions in the two calibration episodes, against the observed trough range and the observed redemptions with
+their tolerances (to be verified).}\label{fig:f4}
 \end{figure}
 
 Table~\ref{tab:validation} and Figure~\ref{fig:f4} show the fit. Redemption volumes are matched in both episodes:
@@ -49,16 +50,20 @@ only: the bill-market results below depend on redemption volumes and timing, whi
 \begin{figure}[tbp]\centering
 \includegraphics[width=\textwidth]{F1_A_baseline_dynamics}
 \caption{Baseline run dynamics for Issuer~A (1{,}000 paths; lines are medians, bands the interquartile and 5--95\%
-ranges). (a)~Secondary price; (b)~cumulative redemptions; (c)~three-month bill-yield impact; (d)~cash sources that
-funded redemptions in the 10\% loss scenario (mean path): the dashed line is cumulative redemptions paid.}
+ranges; each line is labelled at its right end and lines that coincide share a label). (a)~Secondary price;
+(b)~cumulative redemptions, identical across the three loss scenarios because processing capacity binds;
+(c)~three-month bill-yield impact; (d)~cash sources that funded redemptions in the 10\% loss scenario (mean path):
+the dashed line is cumulative redemptions paid. ``Resolved day~2'' is the calibrated liquidity scare: 8\% of
+reserves exposed, resolved without loss on day~2.}
 \label{fig:f1}
 \end{figure}
 
 \begin{table}[tbp]\centering\small
-\caption{E1 baseline, Issuer~A, 1{,}000 Monte Carlo paths, 30 business days. Medians across paths unless stated.
-``Resolved'' = 8\% of reserves exposed, no processing on day~1, exposure resolved without loss on day~2.}
+\caption{E1 baseline, Issuer~A: 1{,}000 Monte Carlo paths, 30 business days. Medians across paths unless stated.
+``8\% exposure, resolved day~2'' is the calibrated liquidity scare: no processing on day~1, exposure resolved
+without loss on day~2.}
 \label{tab:e1}
-\resizebox{\textwidth}{!}{\input{tables/e1_A}}
+\adjustbox{max width=\textwidth}{\input{tables/e1_A}}
 \end{table}
 
 Figure~\ref{fig:f1} and Table~\ref{tab:e1} show Issuer~A under five shocks: no shock, a realised loss of 5, 10 or
@@ -89,15 +94,17 @@ left with nothing. Its liquidity scare ends with 24\% of supply redeemed, the US
 
 \begin{figure}[tbp]\centering
 \includegraphics[width=\textwidth]{F2_tipping_point}
-\caption{Peak three-month bill-yield impact against issuer size (log scales, medians with 5--95\% bands, 300
-paths). ``Rails'' is daily processing capacity as a share of supply: calibrated (1.2\%), fast (5\%) or instant
-(20\%). Dotted lines mark 10, 25 and 50\,bp.}\label{fig:f2}
+\caption{Peak three-month bill-yield impact against issuer size (log scales; lines are medians, bands 5--95\%
+ranges, 300 paths per point). Colour gives the processing rails, daily capacity as a share of supply: calibrated
+(1.2\%), fast (5\%) or instant (20\%); line style gives the price-impact function, square root (baseline) or
+linear (upper bound). Dotted lines mark 10, 25 and 50\,bp.}\label{fig:f2}
 \end{figure}
 
 \begin{table}[tbp]\centering\small
 \caption{E2: median peak three-month bill-yield impact (bp) by issuer size, and the size at which it first exceeds
-10, 25 and 50\,bp (log-linear interpolation). Issuer~A, 300 paths per cell.}\label{tab:e2}
-\resizebox{\textwidth}{!}{\input{tables/e2}}
+10, 25 and 50\,bp (log-linear interpolation). Issuer~A, 300 paths per cell. Rails are daily processing capacity
+as a share of supply: calibrated 1.2\%, fast 5\%, instant 20\%.}\label{tab:e2}
+\adjustbox{max width=\textwidth}{\input{tables/e2}}
 \end{table}
 
 Figure~\ref{fig:f2} and Table~\ref{tab:e2} scale Issuer~A to 2, 3, 5 and 10 times its current size, holding the
@@ -124,18 +131,19 @@ inactive in this model unless the reinvestment leak is closed (Section~\ref{sec:
 \subsection{Policy levers (E3)}
 
 \begin{table}[tbp]\centering\small
-\caption{E3 policy grid: main effects. Each row averages the outcome over the other levers (96 cells per
+\caption{E3 policy grid: main effects. Each row averages the outcome over the other three levers (96 cells per
 configuration, 200 paths per cell). The liquidity run is at today's size with calibrated rails; the solvency run is
-a 10\% loss at five times today's size with fast rails. ``Redemption basis'' rows are single runs without other
+a 10\% loss at five times today's size with fast rails. The redemption-basis rows are single runs without other
 policies.}\label{tab:e3}
-\resizebox{\textwidth}{!}{\input{tables/e3}}
+\adjustbox{max width=\textwidth}{\input{tables/e3}}
 \end{table}
 
 \begin{figure}[tbp]\centering
-\includegraphics[width=0.92\textwidth]{F3_policy_heatmaps}
+\includegraphics[width=\textwidth]{F3_policy_heatmaps}
 \caption{Policy grid for the solvency run at five times today's size with fast rails, by minimum cash buffer and
-redemption fee. Top: peak bill-yield impact with the 93-day maturity cap, without and with a Fed backstop (shared
-colour scale). Bottom: bills sold outright without a backstop, with the 93-day cap and with no cap.}\label{fig:f3}
+redemption fee (cell values are medians over 200 paths). Top: peak bill-yield impact with the 93-day maturity cap,
+without and with a Fed backstop (shared colour scale). Bottom: bills sold outright without a backstop, with the
+93-day cap and with no cap.}\label{fig:f3}
 \end{figure}
 
 Table~\ref{tab:e3} and Figure~\ref{fig:f3} evaluate four levers on a full factorial grid, plus redemption at net
@@ -162,9 +170,10 @@ who stay and the incentive to be first is weaker.
 
 \begin{table}[tbp]\centering\small
 \caption{E4 contagion: a shock to Issuer~A spills over to Issuer~B's beliefs with weight $\beta$ on A's depeg
-(300 paths). ``Combined impact'' applies the persistent impact function to both issuers' net demand withdrawn.}
+(300 paths). The Issuer~B columns are B's outcomes; ``combined impact'' applies the persistent impact function to
+both issuers' net demand withdrawn.}
 \label{tab:e4}
-\resizebox{\textwidth}{!}{\input{tables/e4}}
+\adjustbox{max width=\textwidth}{\input{tables/e4}}
 \end{table}
 
 Table~\ref{tab:e4} shocks Issuer~A and lets Issuer~B's holders add $\beta$ times A's depeg to their expected
@@ -178,9 +187,10 @@ Treasury-market problem, as long as the second issuer's reserves are as liquid a
 
 \begin{figure}[tbp]\centering
 \includegraphics[width=\textwidth]{F5_sensitivity_tornado}
-\caption{One-at-a-time sensitivity (200 paths). Bars show the change in the headline metric when each parameter is
-moved to a low or high value, holding the others at baseline. (a)~Peak bill-yield impact in the solvency run at five
-times today's size with fast rails; (b)~day-30 redemptions in the liquidity run at today's size.}\label{fig:f5}
+\caption{One-at-a-time sensitivity (200 paths). Bars show the headline metric when each parameter is moved to a
+low (blue) or high (orange) value, holding the others at baseline; the vertical line is the baseline and an open
+circle marks a parameter with no measurable effect. (a)~Peak bill-yield impact in the solvency run at five times
+today's size with fast rails; (b)~day-30 redemptions in the liquidity run at today's size.}\label{fig:f5}
 \end{figure}
 
 Figure~\ref{fig:f5} moves fifteen parameters one at a time between a low and a high value. The two panels tell

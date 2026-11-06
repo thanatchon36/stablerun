@@ -1,12 +1,15 @@
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{@{}lrrrrrr@{}}
 \toprule
-Shock to A & $\beta$ & B redeemed d7 & B redeemed d30 & B min price & P(B run) & Combined impact, bp \\
+ &  & \multicolumn{4}{c}{Issuer B} &  \\
+\cmidrule(lr){3-6}
+Shock to Issuer A & $\beta$ & \begin{tabular}[b]{@{}r@{}}Redeemed\\by day 7\end{tabular} & \begin{tabular}[b]{@{}r@{}}Redeemed\\by day 30\end{tabular} & \begin{tabular}[b]{@{}r@{}}Minimum\\price\end{tabular} & P(run) & \begin{tabular}[b]{@{}r@{}}Combined\\impact, bp\end{tabular} \\
 \midrule
 Liquidity run & 0.0 & 2.0\% & 2.3\% & 0.998 & 0\% & 17.5 \\
-Liquidity run & 0.3 & 14.0\% & 14.0\% & 0.967 & 9\% & 17.5 \\
-Liquidity run & 0.6 & 21.0\% & 30.0\% & 0.908 & 100\% & 17.5 \\
+ & 0.3 & 14.0\% & 14.0\% & 0.967 & 9\% & 17.5 \\
+ & 0.6 & 21.0\% & 30.0\% & 0.908 & 100\% & 17.5 \\
+\addlinespace
 Solvency run & 0.0 & 2.0\% & 2.3\% & 0.998 & 0\% & 21.2 \\
-Solvency run & 0.3 & 21.0\% & 70.1\% & 0.879 & 100\% & 21.3 \\
-Solvency run & 0.6 & 21.0\% & 90.0\% & 0.819 & 100\% & 21.2 \\
+ & 0.3 & 21.0\% & 70.1\% & 0.879 & 100\% & 21.3 \\
+ & 0.6 & 21.0\% & 90.0\% & 0.819 & 100\% & 21.2 \\
 \bottomrule
 \end{tabular}

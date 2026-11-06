@@ -103,28 +103,57 @@ def patch_config(path: Path, cfg, best):
 def validation_figure(results, out_stem):
     import matplotlib.pyplot as plt
     from . import style
-    from .plots import PALETTE, fan
-    fig, axes = plt.subplots(2, 2, figsize=(6.5, 4.8))
+    from .plots import fan
+    from .style import INK_2, PALETTE, panel_title
+    fig, axes = plt.subplots(2, 2, figsize=(6.5, 5.0), sharex=True)
     for j, (ep, r) in enumerate(results.items()):
         spec = EPISODES[ep]
         t = np.arange(r["T"] + 1)
         a, b = axes[0, j], axes[1, j]
-        fan(a, t, r["price"], PALETTE["blue"], "Model (median, IQR, 5-95%)")
+        a.axhline(1.0, color=INK_2, lw=0.6, ls=(0, (1, 2)), zorder=1)
+        fan(a, t, r["price"], PALETTE["blue"], "Model (median, IQR, 5–95% band)")
         lo, hi = (0.87, 0.88) if ep == "usdc_2023" else (0.95, 0.97)
-        a.axhspan(lo, hi, color=PALETTE["vermillion"], alpha=0.25, lw=0, label="Observed trough range [verify]")
+        a.axhspan(lo, hi, color=PALETTE["vermillion"], alpha=0.25, lw=0, label="Observed trough range")
         name = "USDC, March 2023 (Issuer B)" if ep == "usdc_2023" else "USDT, May 2022 (Issuer A)"
-        a.set(title=f"({'ab'[j]}) {name}: token price", ylabel="USD per token", ylim=(0.8, 1.02))
+        panel_title(a, "ab"[j], f"{name}: token price")
+        a.set(ylabel="USD per token", ylim=(0.8, 1.02), xlim=(0, r["T"]), xticks=range(0, r["T"] + 1, 5))
         fan(b, t, 100 * r["R"], PALETTE["blue"])
-        for k, (m, tol) in spec["targets"].items():
-            if k.startswith("R_day"):
-                d = int(k[5:])
-                b.errorbar([d], [100 * m], yerr=[[100 * tol], [100 * tol]], fmt="o", color=PALETTE["vermillion"],
-                           capsize=3, label="Observed redemptions [verify]" if d == min(int(x[5:]) for x in spec["targets"] if x.startswith("R_day")) else None)
-        b.set(title=f"({'cd'[j]}) Cumulative redemptions", ylabel="% of initial supply", xlabel="Business day")
-        if j == 0:
-            a.legend(fontsize=6.8, loc="lower right"); b.legend(fontsize=6.8, loc="lower right")
-    fig.tight_layout(w_pad=1.5, h_pad=1.2)
+        days = sorted(int(k[5:]) for k in spec["targets"] if k.startswith("R_day"))
+        for d in days:
+            m, tol = spec["targets"][f"R_day{d}"]
+            b.errorbar([d], [100 * m], yerr=100 * tol, fmt="o", color=PALETTE["vermillion"], ms=4.5, mec="white", mew=0.6,
+                       capsize=3, lw=1.2, zorder=4, label="Observed redemptions (± tolerance)" if d == days[0] else None)
+        panel_title(b, "cd"[j], "Cumulative redemptions")
+        b.set(ylabel="% of initial supply", xlabel="Business day", ylim=(0, 30))
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    h2, l2 = axes[1, 0].get_legend_handles_labels()
+    fig.legend(handles + h2, labels + l2, loc="lower center", ncol=3, bbox_to_anchor=(0.5, 0.0), fontsize=7.8,
+               handlelength=1.8, columnspacing=1.6)
+    fig.tight_layout(rect=[0, 0.05, 1, 1], w_pad=2.0, h_pad=1.4)
     style.save(fig, out_stem)
+
+
+def run_validation(cfg, out_dir=None, n_paths_final=300, exp_A=None):
+    """Run the two calibration episodes with the current (calibrated) config: writes calibration_validation.csv
+    and Figure F4. The feared USDT exposure comes from the best row of calibration_grid.csv unless given."""
+    out_dir = Path(out_dir) if out_dir else ROOT / "results"
+    if exp_A is None:
+        grid_path = out_dir / "tables" / "calibration_grid.csv"
+        exp_A = float(pd.read_csv(grid_path)["exp_A"].iloc[0]) if grid_path.exists() else EPISODES["usdt_2022"]["shock"]["exposure"]
+    episodes = {ep: dict(spec, shock=dict(spec["shock"])) for ep, spec in EPISODES.items()}
+    episodes["usdt_2022"]["shock"]["exposure"] = exp_A
+    results, rows = {}, []
+    for ep, spec in episodes.items():
+        r = simulate(cfg, spec["shock"], n_paths=n_paths_final, seed=cfg["meta"]["seed"], issuer=spec["issuer"])
+        results[ep] = r
+        st = episode_stats(r)
+        for k, (m, tol) in spec["targets"].items():
+            rows.append({"episode": ep, "target": k, "observed": m, "tolerance": tol, "model": round(st[k], 4),
+                         "z": round((st[k] - m) / tol, 2)})
+    val = pd.DataFrame(rows)
+    val.to_csv(out_dir / "tables" / "calibration_validation.csv", index=False)
+    validation_figure(results, out_dir / "figures" / "F4_validation")
+    return val, results
 
 
 def run_calibration(cfg, out_dir=None, n_paths_final=300):
@@ -135,18 +164,7 @@ def run_calibration(cfg, out_dir=None, n_paths_final=300):
     patch_config(ROOT / "config" / "params_default.yaml", cfg, best)
     from .config import load_config
     cal = load_config()
-    results, rows = {}, []
-    EPISODES["usdt_2022"]["shock"]["exposure"] = best["exp_A"]
-    for ep, spec in EPISODES.items():
-        r = simulate(cal, spec["shock"], n_paths=n_paths_final, seed=cal["meta"]["seed"], issuer=spec["issuer"])
-        results[ep] = r
-        st = episode_stats(r)
-        for k, (m, tol) in spec["targets"].items():
-            rows.append({"episode": ep, "target": k, "observed": m, "tolerance": tol, "model": round(st[k], 4),
-                         "z": round((st[k] - m) / tol, 2)})
-    val = pd.DataFrame(rows)
-    val.to_csv(out_dir / "tables" / "calibration_validation.csv", index=False)
-    validation_figure(results, out_dir / "figures" / "F4_validation")
+    val, _ = run_validation(cal, out_dir, n_paths_final, exp_A=best["exp_A"])
     lines = ["# Phase 2 calibration", "", "Best shared parameters (grid, 40 paths x 4,000 agents): "
              f"eta = {best['eta']}, threshold scale = {best['thr_scale']}, w1 = {best['w1']}, psi = {best['psi']}, USDT-2022 feared exposure = {best['exp_A']}; "
              f"Issuer A cap/arb = {best['cap_A']}/{best['arb_A']}, Issuer B cap/arb = {best['cap_B']}/{best['arb_B']} (shares of supply per day).",

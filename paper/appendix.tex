@@ -1,9 +1,10 @@
 \section{Parameter table}\label{app:params}
 
-\begin{table}[H]\centering\footnotesize
-\caption{All model parameters (from \texttt{config/params\_default.yaml}, version 0.3). ``[verify]'' marks
-values taken from memory of public sources that must be checked against the primary document.}\label{tab:params}
-\input{tables/params}
+\begin{table}[H]\centering\footnotesize\renewcommand{\arraystretch}{1.0}\setlength{\tabcolsep}{4pt}
+\caption{All model parameters (from \texttt{config/params\_default.yaml}, version 0.3). Where a row lists
+several values they are in the order named in the parameter column. ``[verify]'' marks values taken from memory
+of public sources that must be checked against the primary document.}\label{tab:params}
+\adjustbox{max width=\textwidth}{\input{tables/params}}
 \end{table}
 
 \section{Pseudo-code}\label{app:pseudo}
@@ -59,7 +60,8 @@ with $E(x)$ when $w_1=w_3=w_4=0$, $\sigma_\nu=0$ and the belief is held fixed: t
 percentage point.
 
 \begin{table}[H]\centering\small
-\caption{Benchmark check: share of supply exiting within 30 days (100 paths) against the closed-form aggregate.}
+\caption{Benchmark check: share of supply exiting within 30 days in the simulation with the behavioural channels
+off (100 paths) against the closed-form threshold aggregate.}
 \label{tab:benchmark}
 \input{tables/benchmark}
 \end{table}
@@ -76,7 +78,7 @@ aggregate.}\label{fig:f6}
 \caption{E1 baseline for Issuer~B (1{,}000 paths). Same scenarios as Table~\ref{tab:e1}; Issuer~B has no cushion of
 other assets, so a realised loss hits deposits and the reserve fund directly, and its processing capacity is 3\% of
 supply per day.}\label{tab:e1B}
-\resizebox{\textwidth}{!}{\input{tables/e1_B}}
+\adjustbox{max width=\textwidth}{\input{tables/e1_B}}
 \end{table}
 
 \begin{figure}[H]\centering
