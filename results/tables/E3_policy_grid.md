@@ -1,4 +1,4 @@
-# E3 policy grid — main effects (300 paths per cell)
+# E3 policy grid — main effects (200 paths per cell)
 
 ## scare_1x_calibrated
 

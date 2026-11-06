@@ -89,7 +89,7 @@ def run_e2(cfg, out_dir, sizes=(1, 2, 3, 5, 10), n_paths=300):
 E3_CONFIGS = [("scare_1x_calibrated", SCARE, 1.0, None), ("loss10_5x_fast", LOSS10, 5.0, FAST_CAP)]
 
 
-def run_e3(cfg, out_dir, n_paths=300, only=None, backstops=None):
+def run_e3(cfg, out_dir, n_paths=200, only=None, backstops=None):
     pg = cfg["policy_grid"]
     configs = [c for c in E3_CONFIGS if only is None or c[0] == only]
     bss = pg["fed_backstop"] if backstops is None else backstops
@@ -121,7 +121,7 @@ def write_e3_markdown(cfg, out_dir):
     pg = cfg["policy_grid"]
     df = pd.read_csv(out_dir / "tables" / "E3_policy_grid.csv")
     df["maturity_cap"] = df["maturity_cap"].astype(str).str.replace(".0", "", regex=False)
-    lines = ["# E3 policy grid — main effects (300 paths per cell)", ""]
+    lines = ["# E3 policy grid — main effects (200 paths per cell)", ""]
     for cname, _, _, _ in E3_CONFIGS:
         g = df[(df.config == cname) & (df.cash_buffer.astype(str).isin([str(x) for x in pg["cash_buffer"]]))].copy()
         g["cash_buffer"] = g["cash_buffer"].astype(float)

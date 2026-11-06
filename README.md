@@ -33,7 +33,7 @@ paper uses it to measure how a run reaches the bill market.
   50 bp mark at 5.5–8×. Under linear impact (the upper bound) both are crossed today.
 - **Policy levers:** a 20–30% cash buffer removes the bill-market footprint of a liquidity run and cuts that of a
   solvency run by two thirds. Maturity caps convert outright sales into non-rollover. Redemption fees do little.
-  Redeeming at net asset value rather than par halves the depeg.
+  Redeeming at net asset value rather than par cuts the depeg by a third.
 
 <p align="center"><img src="results/figures/F2_tipping_point.png" alt="Peak three-month bill-yield impact against issuer size" width="720"></p>
 
@@ -117,7 +117,7 @@ scripts/          run_all.py (CLI), make_tables.py (LaTeX tables), make_hf_datas
 tests/            pytest suite
 results/          figures (PDF and PNG) and tables (Markdown and CSV) for every experiment
 paper/            LaTeX source, bibliography, figures and tables; make_arxiv.sh builds the arXiv bundle
-docs/             proposal, phase notes, references to verify, LinkedIn post and card (scripts/make_linkedin_card.py), logo
+docs/             proposal, phase notes, references to verify, LinkedIn post, card and poster (scripts/make_linkedin_card.py, make_linkedin_poster.py), logo
 ```
 
 ## Honesty and limitations

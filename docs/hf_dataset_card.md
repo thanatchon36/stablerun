@@ -37,7 +37,7 @@ Treasury-bill market.
 
 - **Paper (PDF):** https://github.com/thanatchon36/stablerun/raw/main/paper.pdf
 - **Code:** https://github.com/thanatchon36/stablerun (`python scripts/run_all.py --experiment all` regenerates every file here)
-- **DOI:** https://doi.org/10.5281/zenodo.23996044 (Zenodo archive of release v0.3.0)
+- **DOI:** https://doi.org/10.5281/zenodo.23996044 (Zenodo; resolves to the latest release)
 
 These are model outputs, not observations. Nothing here is market data. The institutional inputs (issuer
 sizes, reserve mixes) are defaults flagged `VERIFY` in `config/params_default.yaml`, and the model is a
@@ -51,9 +51,9 @@ stress-testing tool, not a forecast.
 | `e1_summary` | 10 | E1 medians, 5th and 95th percentiles and probabilities per issuer and scenario |
 | `e2_tipping_point` | 60 | E2: peak impact against issuer size (1, 2, 3, 5, 10× today), by scenario, impact form and redemption rails, 300 paths per cell |
 | `e2_crossings` | 12 | E2: size multiple at which median peak impact first exceeds 10, 25 and 50 bp |
-| `e3_policy_grid` | 196 | E3: cash buffer × redemption fee × maturity cap × Fed backstop, plus par against NAV redemption, 300 paths per cell |
+| `e3_policy_grid` | 196 | E3: cash buffer × redemption fee × maturity cap × Fed backstop, plus par against NAV redemption, 200 paths per cell |
 | `e4_contagion` | 6 | E4: a run on Issuer A spills over to Issuer B's beliefs with weight beta |
-| `e5_sensitivity` | 30 | E5: one-at-a-time sensitivity (tornado), low and high value of each parameter |
+| `e5_sensitivity` | 30 | E5: one-at-a-time sensitivity (tornado), low and high value of each parameter, 200 paths per run |
 | `benchmark_check` | 9 | Simulated exit share with behavioural channels off against the closed-form threshold aggregate |
 | `calibration_grid` | 48 | Calibration search over the behavioural parameters, with loss and fitted moments for both episodes |
 | `calibration_validation` | 5 | Fitted moments against the USDC (March 2023) and USDT (May 2022) targets |

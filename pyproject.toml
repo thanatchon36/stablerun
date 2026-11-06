@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stablerun"
-version = "0.3.0"
+version = "0.3.1"
 description = "Agent-based stress test of stablecoin runs and Treasury-bill fire-sale spillovers"
 authors = [{name = "Thanatchon Chongmankhong"}]
 license = {text = "MIT"}
