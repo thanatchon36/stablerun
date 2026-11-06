@@ -1,0 +1,1412 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>When Stablecoins Run</title>
+<meta name="description" content="Working paper: an agent-based stress test of stablecoin runs and their fire-sale spillovers to the US Treasury-bill market.">
+<meta name="author" content="Thanatchon Chongmankhong">
+<style>
+/* Web reader for paper/main.tex, in the format of the thainowcast reader: one reading column (~46rem)
+   with a results strip up top. System font stacks only: no third-party requests. Colour tokens on :root,
+   redefined for dark. Built by scripts/build_web_paper.py. */
+:root {
+  --paper: #fbfbf9; --ink: #17191c; --ink-2: #4c5058; --rule: #dcdcd6;
+  --accent: #1f5fae; --accent-soft: #e6eef8;
+  --pos: #1d6b52; --pos-soft: #e3f1ea; --null: #6b6f78; --null-soft: #eeeeea;
+  --find: #8a5a12; --find-soft: #f6eedd; --plate: #ffffff; --quote: #f3f3ef;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-body: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15171a; --ink: #e8e9ec; --ink-2: #a6abb4; --rule: #30343a;
+    --accent: #7fb0ec; --accent-soft: #1b2a3d; --pos: #7dcfac; --pos-soft: #16302a;
+    --null: #a6abb4; --null-soft: #23262b; --find: #e7bd73; --find-soft: #33291a;
+    --plate: #f4f4f2; --quote: #1d2024; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15171a; --ink: #e8e9ec; --ink-2: #a6abb4; --rule: #30343a;
+  --accent: #7fb0ec; --accent-soft: #1b2a3d; --pos: #7dcfac; --pos-soft: #16302a;
+  --null: #a6abb4; --null-soft: #23262b; --find: #e7bd73; --find-soft: #33291a;
+  --plate: #f4f4f2; --quote: #1d2024; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.62 var(--font-body); }
+.page { max-width: 46rem; margin: 0 auto; padding-inline: 16px; padding-block: 48px 72px;
+  display: flex; flex-direction: column; gap: 40px; }
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 650; text-wrap: balance; line-height: 1.2; }
+h1 { font-size: clamp(1.7rem, 4.2vw, 2.35rem); margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: 1.4rem; margin: 2.2em 0 0.5em; }
+h3 { font-size: 1.12rem; margin: 1.8em 0 0.4em; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+code { font: 500 0.84em var(--font-mono); overflow-wrap: anywhere; }
+pre { background: var(--quote); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px;
+  overflow-x: auto; font-size: 0.84rem; line-height: 1.5; }
+pre code { font-weight: 400; font-size: inherit; overflow-wrap: normal; }
+.masthead { display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid var(--rule); padding-bottom: 28px; }
+.kicker { margin: 0; font: 500 0.78rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.09em; color: var(--accent); }
+.subtitle { margin: 0; font-style: italic; color: var(--ink-2); font-size: 1.05rem; }
+.byline { margin: 0; color: var(--ink-2); }
+.meta { margin: 0; font: 400 0.8rem/1.6 var(--font-mono); color: var(--ink-2); }
+.meta b { font-weight: 500; color: var(--ink); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 0; padding: 0; list-style: none; }
+.actions a { display: inline-block; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 999px;
+  font: 500 0.78rem var(--font-mono); text-decoration: none; color: var(--ink); }
+.actions a:hover { border-color: var(--accent); color: var(--accent); }
+.abstract h2, .results h2, .toc h2, .cite h2 { margin: 0 0 10px; font-size: 0.82rem; font-family: var(--font-mono);
+  font-weight: 500; text-transform: uppercase; letter-spacing: 0.09em; color: var(--ink-2); }
+.abstract-body p { margin: 0 0 0.8em; font-size: 1.04rem; }
+.abstract-body p:last-child { margin-bottom: 0; }
+.results .note { margin: 0 0 14px; color: var(--ink-2); font-size: 0.95rem; }
+.result-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 8px; }
+.r { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "id tag" "text text"; gap: 2px 10px;
+  align-content: start; padding: 10px 12px; border-radius: 6px; border-left: 3px solid; font-size: 0.9rem; line-height: 1.4; }
+.r-pos { background: var(--pos-soft); border-color: var(--pos); }
+.r-ref { background: var(--find-soft); border-color: var(--find); }
+.r-null, .r-nf { background: var(--null-soft); border-color: var(--null); }
+.r-id { grid-area: id; font: 500 0.85rem var(--font-mono); }
+.r-text { grid-area: text; }
+.r-text small { display: block; color: var(--ink-2); font-size: 0.8rem; margin-top: 2px; }
+.toc ul { margin: 0; padding-left: 1.2em; columns: 2 14rem; column-gap: 32px; }
+.toc li { break-inside: avoid; }
+.toc ul ul { columns: 1; padding-left: 1em; font-size: 0.92em; color: var(--ink-2); }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.paper h1 { font-size: 1.55rem; margin: 2em 0 0.5em; padding-top: 0.6em; border-top: 1px solid var(--rule); }
+.paper p, .paper li { hyphens: auto; }
+.paper p { margin: 0 0 1em; }
+.paper math[display="block"] { overflow-x: auto; max-width: 100%; }
+/* MathML does not line-break: a long inline formula scrolls on its own instead of widening the page */
+.paper math.wide { display: inline-block; max-width: 100%; overflow-x: auto; overflow-y: hidden; vertical-align: middle; }
+/* A display equation with its number at the right; a wide one scrolls on its own, the number stays put. */
+.eq { display: flex; align-items: center; gap: 12px; margin: 1.1em 0; scroll-margin-top: 16px; }
+.eq math { display: block; flex: 1 1 auto; min-width: 0; overflow-x: auto; overflow-y: hidden; padding-block: 4px; }
+.eqno { flex: none; font: 400 0.85rem var(--font-mono); color: var(--ink-2); }
+.paper [id] { scroll-margin-top: 16px; }
+.paper .header-section-number { color: var(--accent); margin-right: 0.5em; font-family: var(--font-mono); font-size: 0.85em; font-weight: 500; }
+.paper blockquote { margin: 1.2em 0; padding: 10px 16px; border-left: 3px solid var(--rule); background: var(--quote);
+  border-radius: 0 6px 6px 0; font-size: 0.93rem; color: var(--ink-2); }
+.paper blockquote p:last-child { margin-bottom: 0; }
+figure { margin: 1.6em 0; display: flex; flex-direction: column; gap: 10px; }
+figure img { background: var(--plate); padding: 12px; border-radius: 6px; border: 1px solid var(--rule); max-width: 100%; height: auto; }
+figcaption, caption, .tcap { font-size: 0.88rem; color: var(--ink-2); line-height: 1.45; text-align: left; }
+caption { caption-side: top; padding-bottom: 8px; }
+.tbl { margin: 1.6em 0; }
+.paper .tcap { margin: 0 0 8px; hyphens: auto; }
+.tscroll { overflow-x: auto; }
+/* Tables keep their natural width (scrolling sideways when wider than the column); only long text cells wrap. */
+.paper table { border-collapse: collapse; width: max-content; min-width: 100%;
+  font: 400 0.78rem/1.45 var(--font-mono); font-variant-numeric: tabular-nums; }
+.paper td { max-width: 17em; }
+/* Code in table cells must not break per letter on phones; the table scrolls sideways instead. */
+.paper table code { overflow-wrap: normal; word-break: normal; white-space: nowrap; }
+th, td { padding: 6px 10px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+th { font-weight: 500; color: var(--ink-2); border-bottom-color: var(--ink-2); }
+.paper strong { font-weight: 650; }
+.paper figcaption strong, .paper .tcap strong { color: var(--ink); }
+.csl-entry { margin: 0 0 0.6em; padding-left: 1.5em; text-indent: -1.5em; font-size: 0.92rem; overflow-wrap: anywhere; }
+.cite { min-width: 0; }
+/* BibTeX keeps its lines intact (no mid-URL breaks); the block scrolls sideways on narrow screens. */
+.cite pre { overflow-x: auto; }
+.cite pre, .cite pre code { white-space: pre; overflow-wrap: normal; word-break: normal; }
+.colophon { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-2); font-size: 0.85rem; }
+.colophon p { margin: 0 0 0.7em; }
+@media (max-width: 480px) { body { font-size: 16px; } .page { padding-block: 28px 48px; gap: 28px; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="page">
+<header class="masthead">
+  <p class="kicker">Working paper · stablerun</p>
+  <h1>When Stablecoins Run: Fire-Sale Spillovers to the Treasury Bill Market</h1>
+  <p class="subtitle">An Agent-Based Stress Test</p>
+  <p class="byline">Thanatchon Chongmankhong · <a href="https://github.com/thanatchon36/stablerun">github.com/thanatchon36/stablerun</a></p>
+  <p class="meta"><b>November 2026</b> · stablecoins, Treasury bills, bank runs, fire sales, agent-based models, financial stability · JEL G01, G21, G23, E58</p>
+  <ul class="actions"><li><a href="paper.pdf">Download PDF</a></li><li><a href="https://github.com/thanatchon36/stablerun">Code and replication</a></li><li><a href="https://huggingface.co/datasets/thanatchon36/stablerun">Data (Hugging Face)</a></li><li><a href="https://doi.org/10.5281/zenodo.23996044">Zenodo archive</a></li></ul>
+</header>
+<section class="abstract" aria-label="Abstract">
+  <h2>Abstract</h2>
+  <div class="abstract-body"><p>Payment stablecoins have become large holders of US Treasury bills, and the GENIUS Act of 2025 will push their reserves further into bills of 93 days or less. We build an agent-based stress test in which heterogeneous holders exit on private signals, a visible depeg and peer behaviour; only authorised redeemers reach the issuer at par, while everyone else sells on a secondary market where capital-constrained arbitrageurs convert discounts into redemptions; the issuer pays through a liquidation waterfall and the bill market absorbs outright sales and withdrawn auction demand with permanent and temporary price impact. Calibrated to the USDC episode of March 2023 and the USDT episode of May 2022, the model yields three results. First, at today’s size a run on the largest issuer moves three-month bill yields by roughly 20 bp and sells essentially no bills outright: redemptions are throttled by processing capacity and funded by run-off, so the externality takes the form of demand withdrawn at auction rather than a fire sale, and the issuer’s own fire-sale losses are negligible because bill duration is tiny. Second, scaling the sector, the 25 bp mark is crossed at roughly 1.4–2 times today’s size and the 50 bp mark at 5.5–8 times under square-root price impact; under linear impact (an upper bound) both are crossed already today. Third, a cash buffer of 20–30% of reserves removes the bill-market footprint of a liquidity run and cuts that of a solvency run by two thirds; maturity caps convert outright sales into non-rollover; redemption fees are ineffective; redeeming at net asset value rather than par cuts the depeg by a third. The single most important unknown is how much redeemed cash returns to bills through money market funds.</p>
+</div>
+</section>
+<section class="results" aria-label="Results at a glance">
+  <h2>Results at a glance</h2>
+  <p class="note">Headline numbers, read from the result files. Amber: model results; grey: pending.</p>
+  <ul class="result-list"><li class="r r-ref"><span class="r-id">Spillover</span><span class="r-text">A run at today’s size moves three-month bill yields by 18–21 bp<small>liquidity run and 10% loss on the largest issuer, square-root impact; bills sold outright: $0 bn and $0 bn</small></span></li>
+<li class="r r-ref"><span class="r-id">Channel</span><span class="r-text">The externality is demand withdrawn at auction, not a fire sale<small>redemptions are throttled by processing capacity and funded by maturing bills</small></span></li>
+<li class="r r-ref"><span class="r-id">Systemic size</span><span class="r-text">25 bp is crossed at 1.4×–2.0× today’s size, 50 bp at 5.5×–8.1×<small>square-root impact, calibrated processing rails</small></span></li>
+<li class="r r-ref"><span class="r-id">Upper bound</span><span class="r-text">Linear impact: 44 bp in a liquidity run and 64 bp in a solvency run at today’s size<small>every billion withdrawn costs the same; bounds the square-root results from above</small></span></li>
+<li class="r r-ref"><span class="r-id">Cash buffer</span><span class="r-text">A 30% buffer cuts a solvency run’s footprint from 41 to 15 bp<small>a 20% buffer takes a liquidity run from 7 to 0 bp; redemptions and the price trough do not change</small></span></li>
+<li class="r r-ref"><span class="r-id">Redemption basis</span><span class="r-text">Redeeming at net asset value lifts the trough from 0.75 to 0.83, a depeg smaller by 33%<small>it does not stop the run: 52.6% redeemed against 51.9%; a 2% fee moves the footprint only from 30 to 28 bp</small></span></li>
+<li class="r r-ref"><span class="r-id">Key unknown</span><span class="r-text">Reinvestment through money market funds moves the footprint between 14 and 69 bp<small>solvency run at 5× today’s size, share of redeemed cash returning to bills from one to zero</small></span></li>
+<li class="r r-ref"><span class="r-id">Contagion</span><span class="r-text">A solvency run spills over to take 70% of the second issuer’s supply<small>belief weight 0.3; combined bill-market impact stays at 21 bp</small></span></li>
+<li class="r r-null"><span class="r-id">Inputs</span><span class="r-text">Calibration inputs and references still to be verified<small>compiled without access to primary sources; check them before citing the paper</small></span></li></ul>
+</section>
+<nav class="toc" aria-label="Contents"><h2>Contents</h2>
+<ul>
+<li><a href="#introduction" id="toc-introduction"><span class="toc-section-number">1</span> Introduction</a></li>
+<li><a href="#sec:background" id="toc-sec:background"><span class="toc-section-number">2</span> Institutional background</a></li>
+<li><a href="#sec:lit" id="toc-sec:lit"><span class="toc-section-number">3</span> Related literature</a></li>
+<li><a href="#sec:model" id="toc-sec:model"><span class="toc-section-number">4</span> Model</a></li>
+<li><a href="#sec:calib" id="toc-sec:calib"><span class="toc-section-number">5</span> Calibration and validation</a></li>
+<li><a href="#sec:results" id="toc-sec:results"><span class="toc-section-number">6</span> Results</a></li>
+<li><a href="#sec:robust" id="toc-sec:robust"><span class="toc-section-number">7</span> Robustness</a></li>
+<li><a href="#sec:policy" id="toc-sec:policy"><span class="toc-section-number">8</span> Policy implications</a></li>
+<li><a href="#sec:conclusion" id="toc-sec:conclusion"><span class="toc-section-number">9</span> Conclusion</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
+<li><a href="#app:params" id="toc-app:params"><span class="toc-section-number">A</span> Parameter table</a></li>
+<li><a href="#app:pseudo" id="toc-app:pseudo"><span class="toc-section-number">B</span> Pseudo-code</a></li>
+<li><a href="#app:benchmark" id="toc-app:benchmark"><span class="toc-section-number">C</span> Analytic benchmark</a></li>
+<li><a href="#app:extra" id="toc-app:extra"><span class="toc-section-number">D</span> Additional results</a></li>
+</ul>
+</nav>
+<article class="paper">
+<h1 data-number="1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
+<p>Payment stablecoins are money-like liabilities backed by portfolios that look increasingly like those of government money market funds. The two largest issuers alone report well over $200 bn of US Treasury bills, reverse repo and government money market fund shares, and the GENIUS Act signed in July 2025 confines permitted reserve assets to cash, insured deposits, bills with no more than 93 days to maturity, Treasury-backed repo and government money market funds <span class="citation" data-cites="genius2025">(<a href="#ref-genius2025" role="doc-biblioref">United States Congress 2025</a>, all institutional figures used in this paper are listed for verification in the repository)</span>. A growing empirical literature documents that stablecoin flows already move the front end of the Treasury curve in normal times <span class="citation" data-cites="ahmed2025">(<a href="#ref-ahmed2025" role="doc-biblioref">Ahmed and Aldasoro 2025</a>)</span>, and the Treasury Borrowing Advisory Committee has discussed stablecoins as a structural source of bill demand <span class="citation" data-cites="tbac2025">(<a href="#ref-tbac2025" role="doc-biblioref">Treasury Borrowing Advisory Committee 2025</a>)</span>.</p>
+<p>What happens to that demand when a stablecoin runs? Two episodes give partial answers. In May 2022 Tether redeemed roughly a tenth of its supply in two weeks after the collapse of Terra, with a brief and shallow depeg. In March 2023 USDC fell to about 88 cents over a weekend after Circle disclosed that $3.3 bn of its reserves sat at Silicon Valley Bank, recovered within two days once deposits were guaranteed, and still lost about a quarter of its supply over the following month <span class="citation" data-cites="circle2023 tether2022">(<a href="#ref-circle2023" role="doc-biblioref">Circle 2023</a>; <a href="#ref-tether2022" role="doc-biblioref">Tether 2022</a>)</span>. Neither episode disturbed the bill market, but neither involved an issuer of today’s size, let alone the multiples that industry projections contemplate. The question this paper asks is quantitative: when a run happens, how much bill-market dislocation does the forced liquidation of reserves cause, through which channel, and at what sector size does it become a financial-stability concern?</p>
+<p>Two episodes are too few for econometrics, so we answer with a calibrated agent-based model. Holders are heterogeneous in size, information, attention and access to the issuer: institutions and arbitrageurs can redeem at par, retail and most exchanges can only sell on a secondary market. Exit decisions follow a global-games-style threshold rule on a private signal about reserve impairment, a visible depeg, peer behaviour and a suspension flag. The secondary price carries a fundamental discount (the expected loss share of whoever remains) and a liquidity discount proportional to the stock of tokens that arbitrageurs have not yet absorbed. The issuer pays redemptions through a waterfall (cash, repo, money market fund shares, bills shortest-first, other assets at a haircut), subject to a daily processing capacity, and manages liquidity by keeping cash for pending claims and rolling the rest of its maturing bills. The bill market absorbs outright sales and demand withdrawn at auction with a persistent and a temporary impact component, a dealer-capacity penalty and a reinvestment leak through which redeemed cash returns via money market funds. A second issuer receives a belief spillover from the first. The model nests a closed-form threshold aggregate when the behavioural channels are switched off, and we show that the simulation reproduces it exactly.</p>
+<p>Our contribution is threefold. First, we quantify the spillover and identify its channel. At today’s size a run on the largest issuer, whether a liquidity scare or a 10% loss of reserves, moves three-month bill yields by 17–21 bp in the model, and the issuer sells no bills outright: with processing capacity of about 1.2% of supply per day, redemptions are funded entirely by the $2.8 bn a day of maturing bills. The externality is demand withdrawn at auction, not a fire sale, and the issuer’s fire-sale loss is negligible because the bills it would sell have a duration of weeks. Second, we turn “stablecoins might be systemic one day” into a number. Under square-root impact, the 25 bp threshold is crossed at 1.4–2 times today’s size and the 50 bp threshold at 5.5–8 times; under linear impact, the upper bound, both are crossed already today. Third, we rank levers. A minimum cash buffer of 20–30% removes the footprint of a liquidity run and cuts that of a solvency run by about two thirds; the 93-day maturity cap converts outright sales into orderly non-rollover; redemption fees do little; redeeming at net asset value rather than par cuts the depeg by a third; a Fed backstop that halves impact halves the footprint by construction. Sensitivity analysis shows a clean separation: the size of a run is governed by behavioural parameters (thresholds, attention, the perceived probability of loss), whereas its Treasury-market footprint is governed by plumbing (how much redeemed cash returns to bills, arbitrage capital, the accounting of non-rollover) and barely by behaviour at all.</p>
+<p>The rest of the paper proceeds as follows. Section <a href="#sec:background">2</a> sets out the institutional mechanics. Section <a href="#sec:lit">3</a> relates the paper to the literature. Section <a href="#sec:model">4</a> presents the model, Section <a href="#sec:calib">5</a> its calibration and validation, Section <a href="#sec:results">6</a> the results, Section <a href="#sec:robust">7</a> robustness, Section <a href="#sec:policy">8</a> policy implications. Section <a href="#sec:conclusion">9</a> concludes. Appendices give the parameter table, pseudo-code and additional figures. Code, configuration and every table in this paper are reproducible from the repository with one command.</p>
+<h1 data-number="2" id="sec:background"><span class="header-section-number">2</span> Institutional background</h1>
+<h4 id="redemption-mechanics.">Redemption mechanics.</h4>
+<p>A payment stablecoin is a token redeemable at par from its issuer, but direct redemption is available only to verified counterparties above a minimum size: for the largest offshore issuer, verified customers with a minimum of $100,000 and a 0.1% fee; for the largest US-regulated issuer, institutional customers of its minting platform <span class="citation" data-cites="tether_attest circle_reserve">(<a href="#ref-tether_attest" role="doc-biblioref">Tether 2026</a>; <a href="#ref-circle_reserve" role="doc-biblioref">Circle 2026</a>)</span>. Everyone else obtains dollars by selling the token on exchanges. The peg is therefore maintained by arbitrageurs who buy discounted tokens on the secondary market and redeem them at par, and the depth of that arbitrage is bounded by their capital and by the issuer’s processing capacity <span class="citation" data-cites="ma2023 lyons2023">(<a href="#ref-ma2023" role="doc-biblioref">Ma et al. 2023</a>; <a href="#ref-lyons2023" role="doc-biblioref">Lyons and Viswanath-Natraj 2023</a>)</span>. During the USDC weekend of March 2023, redemption was unavailable because banks were closed, arbitrage capital stood aside, and the secondary price cleared at a discount of about twelve cents. Once redemption resumed and the Silicon Valley Bank exposure was resolved, the discount closed in a day, but holders who had decided to leave kept redeeming through the following weeks.</p>
+<h4 id="reserve-rules.">Reserve rules.</h4>
+<p>The GENIUS Act requires one-for-one backing in US coins and currency, insured deposits, Treasury bills with at most 93 days to maturity, Treasury-backed repo and reverse repo, shares of government money market funds invested in the same assets, and central bank reserves; issuers must publish monthly reserve reports and disclose their redemption policy, and may not pay interest to holders <span class="citation" data-cites="genius2025">(<a href="#ref-genius2025" role="doc-biblioref">United States Congress 2025</a>)</span>. Issuer attestations at mid-2026 report reserve mixes that already resemble this list: the largest offshore issuer holds roughly two thirds of its assets in bills directly, with reverse repo, money market fund shares and a residual of other assets (bitcoin, gold, secured loans); the largest US-regulated issuer holds about an eighth in bank deposits and the rest in a government money market fund that invests in short bills and overnight repo <span class="citation" data-cites="tether_attest circle_reserve">(<a href="#ref-tether_attest" role="doc-biblioref">Tether 2026</a>; <a href="#ref-circle_reserve" role="doc-biblioref">Circle 2026</a>)</span>. These are the two reserve profiles we model as “Issuer A” and “Issuer B”; the figures are defaults from public reports as remembered by the authors and must be replaced with the latest attestation before publication.</p>
+<h4 id="the-bill-market.">The bill market.</h4>
+<p>Treasury bills outstanding are of the order of $6–7 tn, with daily trading volume in the hundreds of billions; money market funds and foreign official holders are the largest holders, and primary dealers intermediate secondary trading subject to balance-sheet constraints that proved binding in March 2020 <span class="citation" data-cites="duffie2020 vissing2021 he2022">(<a href="#ref-duffie2020" role="doc-biblioref">Duffie 2020</a>; <a href="#ref-vissing2021" role="doc-biblioref">Vissing-Jorgensen 2021</a>; <a href="#ref-he2022" role="doc-biblioref">He et al. 2022</a>)</span>. Two features matter for a stablecoin run. First, bills are the most liquid instrument in the world, so the price impact of even large flows is measured in basis points, not percent; the empirical elasticity of three-month bill yields to stablecoin flows is a few basis points per $3–4 bn over ten days, with outflows mattering more than inflows <span class="citation" data-cites="ahmed2025">(<a href="#ref-ahmed2025" role="doc-biblioref">Ahmed and Aldasoro 2025</a>)</span>. Second, a bill portfolio self-liquidates: a $120 bn ladder of bills with an average maturity of one to two months returns about $3 bn of cash every business day without any sale. An issuer facing redemptions can meet them by not rolling its maturities, which withdraws demand at auction rather than adding supply in the secondary market. Both channels affect yields; only the second is a fire sale in the usual sense, and only the second touches dealer balance sheets.</p>
+<h4 id="the-march-2020-analogue.">The March 2020 analogue.</h4>
+<p>Prime money market funds lost about 15% of assets in two weeks in March 2020, sold commercial paper and bills into dislocated markets, and were backstopped by the Money Market Mutual Fund Liquidity Facility after ten days <span class="citation" data-cites="li2021 fed_mmlf2020">(<a href="#ref-li2021" role="doc-biblioref">Li et al. 2021</a>; <a href="#ref-fed_mmlf2020" role="doc-biblioref">Board of Governors of the Federal Reserve System 2020</a>)</span>. We use this episode to discipline the behaviour of other bill holders and the design of the backstop lever.</p>
+<h1 data-number="3" id="sec:lit"><span class="header-section-number">3</span> Related literature</h1>
+<p>The paper sits at the intersection of three literatures. The first studies stablecoin runs. <span class="citation" data-cites="gorton2023">Gorton and Zhang (<a href="#ref-gorton2023" role="doc-biblioref">2023</a>)</span> argue that privately issued stablecoins are the wildcat banknotes of our time; <span class="citation" data-cites="anadu2023">Anadu et al. (<a href="#ref-anadu2023" role="doc-biblioref">2023</a>)</span> document that stablecoin flows during 2022–23 resembled money market fund runs and flights to safety; <span class="citation" data-cites="ma2023">Ma et al. (<a href="#ref-ma2023" role="doc-biblioref">2023</a>)</span> show that the centralisation of arbitrage, which we model as a capital- and capacity-constrained arbitrage bid, trades off peg stability against run risk; <span class="citation" data-cites="lyons2023">Lyons and Viswanath-Natraj (<a href="#ref-lyons2023" role="doc-biblioref">2023</a>)</span> study what keeps the peg; <span class="citation" data-cites="davernas2022"><span class="nocase">d’Avernas et al.</span> (<a href="#ref-davernas2022" role="doc-biblioref">2022</a>)</span> and <span class="citation" data-cites="bertsch2023">Bertsch (<a href="#ref-bertsch2023" role="doc-biblioref">2023</a>)</span> provide theoretical models of stablecoin fragility; <span class="citation" data-cites="liao2022">Liao and Caramichael (<a href="#ref-liao2022" role="doc-biblioref">2022</a>)</span> and <span class="citation" data-cites="barthelemy2023">Barthélemy et al. (<a href="#ref-barthelemy2023" role="doc-biblioref">2023</a>)</span> analyse the growth of stablecoins and their reserve holdings; <span class="citation" data-cites="bis2025">Bank for International Settlements (<a href="#ref-bis2025" role="doc-biblioref">2025</a>)</span> frame the policy debate around the singleness, elasticity and integrity of money. The second literature concerns runs and fire sales more generally. Our threshold rule is a reduced form of the global-games equilibrium of <span class="citation" data-cites="goldstein2005">Goldstein and Pauzner (<a href="#ref-goldstein2005" role="doc-biblioref">2005</a>)</span>, in the tradition of <span class="citation" data-cites="diamond1983">Diamond and Dybvig (<a href="#ref-diamond1983" role="doc-biblioref">1983</a>)</span>, and our fire-sale cost follows <span class="citation" data-cites="morris2016">Morris and Shin (<a href="#ref-morris2016" role="doc-biblioref">2016</a>)</span>, <span class="citation" data-cites="shleifer2011">Shleifer and Vishny (<a href="#ref-shleifer2011" role="doc-biblioref">2011</a>)</span> and <span class="citation" data-cites="greenwood2015">Greenwood et al. (<a href="#ref-greenwood2015" role="doc-biblioref">2015</a>)</span>; the stress-testing use of fire-sale externalities follows <span class="citation" data-cites="cont2017">Cont and Schaanning (<a href="#ref-cont2017" role="doc-biblioref">2017</a>)</span>. The third literature concerns the Treasury market: the price-impact anchor comes from <span class="citation" data-cites="ahmed2025">Ahmed and Aldasoro (<a href="#ref-ahmed2025" role="doc-biblioref">2025</a>)</span>, the market-structure and March 2020 evidence from <span class="citation" data-cites="duffie2020">Duffie (<a href="#ref-duffie2020" role="doc-biblioref">2020</a>)</span>, <span class="citation" data-cites="vissing2021">Vissing-Jorgensen (<a href="#ref-vissing2021" role="doc-biblioref">2021</a>)</span>, <span class="citation" data-cites="he2022">He et al. (<a href="#ref-he2022" role="doc-biblioref">2022</a>)</span> and <span class="citation" data-cites="fleming2003">Fleming (<a href="#ref-fleming2003" role="doc-biblioref">2003</a>)</span>, and the decomposition of impact into permanent and temporary components from <span class="citation" data-cites="kyle1985">Kyle (<a href="#ref-kyle1985" role="doc-biblioref">1985</a>)</span> and <span class="citation" data-cites="almgren2001">Almgren and Chriss (<a href="#ref-almgren2001" role="doc-biblioref">2001</a>)</span>, with the square-root shape documented by <span class="citation" data-cites="bouchaud2018">Bouchaud et al. (<a href="#ref-bouchaud2018" role="doc-biblioref">2018</a>)</span>. Methodologically we follow the agent-based tradition advocated by <span class="citation" data-cites="farmer2009">Farmer and Foley (<a href="#ref-farmer2009" role="doc-biblioref">2009</a>)</span> and use one-at-a-time and global sensitivity designs <span class="citation" data-cites="saltelli2008 morris1991">(<a href="#ref-saltelli2008" role="doc-biblioref">Saltelli et al. 2008</a>; <a href="#ref-morris1991" role="doc-biblioref">Morris 1991</a>)</span>. What is new is the bridge: a calibrated model in which run dynamics, redemption plumbing and bill-market impact are in one place, so that the size of the spillover, its channel and the leverage of policy can be computed rather than asserted.</p>
+<h1 data-number="4" id="sec:model"><span class="header-section-number">4</span> Model</h1>
+<p>Time is discrete in business days <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>T</mi></mrow><annotation encoding="application/x-tex">t=1,\dots,T</annotation></semantics></math> with <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>=</mo><mn>30</mn></mrow><annotation encoding="application/x-tex">T=30</annotation></semantics></math>. All quantities are vectorised over Monte Carlo paths. We describe one issuer; the second issuer (Section <a href="#sec:e4">6.4</a>) is identical with a belief spillover.</p>
+<h2 data-number="4.1" id="holders"><span class="header-section-number">4.1</span> Holders</h2>
+<p>There are <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><mn>10</mn><mo>,</mo><mn>000</mn></mrow><annotation encoding="application/x-tex">N=10{,}000</annotation></semantics></math> holders of five types <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>: retail, exchanges and market makers, DeFi protocols, institutional treasuries and arbitrageurs, with shares of supply <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>30</mn><mo>,</mo><mn>30</mn><mo>,</mo><mn>20</mn><mo>,</mo><mn>15</mn><mo>,</mo><mn>5</mn><mo stretchy="false" form="postfix">)</mo><mi>%</mi></mrow><annotation encoding="application/x-tex">(30, 30, 20, 15, 5)\%</annotation></semantics></math> and holdings drawn lognormally within type. Only institutional holders and arbitrageurs have direct access to the issuer. At the start of the run the public learns that a share <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math> of reserves is <em>exposed</em> (for example, deposits at a failed bank). A share <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>∈</mo><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">r\in[0,1]</annotation></semantics></math> of the exposure is actually lost; the market assigns probability <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ψ</mi><annotation encoding="application/x-tex">\psi</annotation></semantics></math> that an unresolved exposure becomes a loss, so the expected loss is <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ℓ</mi><mn>0</mn></msub><mo>=</mo><mi>x</mi><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">[</mo><mi>r</mi><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>r</mi><mo stretchy="false" form="postfix">)</mo><mi>ψ</mi><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">\ell_0 = x\,[r + (1-r)\psi]</annotation></semantics></math> until a resolution day <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>t</mi><mi>R</mi></msub><annotation encoding="application/x-tex">t_R</annotation></semantics></math> on which the public learns the realised loss <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mi>r</mi></mrow><annotation encoding="application/x-tex">xr</annotation></semantics></math>. Because the issuer pays at par, the loss falls on whoever has not left: the expected loss share of a remaining holder is <span class="eq" id="eq:1"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mi>t</mi></msub><mspace width="0.278em"></mspace><mo>=</mo><mspace width="0.278em"></mspace><msub><mi>ℓ</mi><mi>t</mi></msub><mspace width="0.167em"></mspace><msub><mi>S</mi><mn>0</mn></msub><mi>/</mi><msub><mi>S</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+b_t \;=\; \ell_t\, S_0 / S_{t-1},
+\end{equation}</annotation></semantics></math><span class="eqno">(1)</span></span> where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ℓ</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\ell_t</annotation></semantics></math> is the public expected loss as a share of initial supply and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>S</mi><mi>t</mi></msub><annotation encoding="application/x-tex">S_t</annotation></semantics></math> is remaining supply. Holder <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> observes <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>b</mi><mi>t</mi></msub><annotation encoding="application/x-tex">b_t</annotation></semantics></math> with a private noise <math class="wide" display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ε</mi><mi>i</mi></msub><mo>∼</mo><mi>N</mi><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\varepsilon_i\sim N(0,\sigma^2)</annotation></semantics></math> fixed over the episode, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>=</mo><msub><mi>b</mi><mi>t</mi></msub><mo>+</mo><msub><mi>ε</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">x_{it}=b_t+\varepsilon_i</annotation></semantics></math>, and forms an exit signal <span class="eq" id="eq:signal"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mspace width="0.278em"></mspace><mo>=</mo><mspace width="0.278em"></mspace><msub><mi>w</mi><mn>2</mn></msub><msub><mi>x</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>+</mo><msub><mi>w</mi><mn>3</mn></msub><msub><mi>H</mi><mi>t</mi></msub><mo>+</mo><msub><mi>w</mi><mn>4</mn></msub><mn>𝟏</mn><mo stretchy="false" form="prefix">[</mo><msub><mtext mathvariant="normal">suspended</mtext><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">]</mo><mo>+</mo><msub><mi>ν</mi><mi>t</mi></msub><mo>+</mo><msub><mi>w</mi><mn>1</mn></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msub><mi>p</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+s_{it} \;=\; w_2 x_{it} + w_3 H_t + w_4 \mathbf{1}[\text{suspended}_{t-1}] + \nu_t + w_1 (1-p_{t-1}),
+\end{equation}</annotation></semantics></math><span class="eqno">(2)</span></span> where <math class="wide" display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mi>t</mi></msub><mo>=</mo><msub><mi>λ</mi><mi>H</mi></msub><msub><mi>H</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><mo stretchy="false" form="prefix">(</mo><msub><mtext mathvariant="normal">exit flow</mtext><mi>t</mi></msub><mi>/</mi><msub><mi>S</mi><mn>0</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">H_t = \lambda_H H_{t-1} + (\text{exit flow}_t / S_0)</annotation></semantics></math> is a decaying herding state, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ν</mi><mi>t</mi></msub><mo>∼</mo><mi>N</mi><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><msubsup><mi>σ</mi><mi>ν</mi><mn>2</mn></msubsup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\nu_t\sim N(0,\sigma_\nu^2)</annotation></semantics></math> is a common daily sentiment shock and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><annotation encoding="application/x-tex">p_{t-1}</annotation></semantics></math> is yesterday’s secondary price. Holder <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> pays attention on a given day with a type-specific probability <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>k</mi></msub><annotation encoding="application/x-tex">a_k</annotation></semantics></math> and exits if <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">s_{it}</annotation></semantics></math> exceeds a threshold <math class="wide" display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mi>i</mi></msub><mo>∼</mo><mi>N</mi><mo stretchy="false" form="prefix">(</mo><msub><mover><mi>θ</mi><mo accent="true">‾</mo></mover><mi>k</mi></msub><mo>,</mo><msubsup><mi>τ</mi><mi>k</mi><mn>2</mn></msubsup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\theta_i\sim N(\bar\theta_k,
+\tau_k^2)</annotation></semantics></math>. An exited holder re-enters, buying tokens back at the market price, if the <em>core</em> signal (the first four terms of (<a href="#eq:signal">2</a>), without the depeg term) has fallen below <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mi>i</mi></msub><mo>−</mo><mi>h</mi></mrow><annotation encoding="application/x-tex">\theta_i - h</annotation></semantics></math>: once fundamentals are fine, a discount is a buying opportunity rather than a reason to stay away. Direct-access holders who exit join the issuer’s redemption queue at par; all others sell on the secondary market.</p>
+<p>The threshold rule is a reduced form of a global game. In <span class="citation" data-cites="goldstein2005">Goldstein and Pauzner (<a href="#ref-goldstein2005" role="doc-biblioref">2005</a>)</span>, agents with private signals about a fundamental coordinate on a unique cutoff; here the cutoffs are heterogeneous by type because redemption access, holding size and costs differ, and we calibrate their level rather than derive it. Appendix <a href="#app:benchmark">C</a> shows that with the herding, depeg and suspension channels switched off and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>b</mi><mi>t</mi></msub><annotation encoding="application/x-tex">b_t</annotation></semantics></math> held fixed, the share of supply that exits converges exactly to the closed-form aggregate <math class="wide" display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mi>k</mi></msub><msub><mi>ω</mi><mi>k</mi></msub><mi mathvariant="normal">Φ</mi><mspace width="-0.167em"></mspace><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">(</mo><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>−</mo><msub><mover><mi>θ</mi><mo accent="true">‾</mo></mover><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msqrt><mrow><msup><mi>σ</mi><mn>2</mn></msup><mo>+</mo><msubsup><mi>τ</mi><mi>k</mi><mn>2</mn></msubsup></mrow></msqrt><mo minsize="120%" maxsize="120%" stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\sum_k \omega_k \Phi\!\big((x-\bar\theta_k)/\sqrt{\sigma^2+\tau_k^2}\big)</annotation></semantics></math>, so the simulation nests a transparent benchmark.</p>
+<h2 data-number="4.2" id="secondary-market-and-arbitrage"><span class="header-section-number">4.2</span> Secondary market and arbitrage</h2>
+<p>Tokens offered on day <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math> are new sales <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>V</mi><mi>t</mi></msub><annotation encoding="application/x-tex">V_t</annotation></semantics></math> plus the <em>overhang</em> <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>O</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><annotation encoding="application/x-tex">O_{t-1}</annotation></semantics></math> of tokens held by uninformed dip buyers who resell. Demand at par from re-entering holders is served first. Arbitrageurs then buy <span class="eq" id="eq:3"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>B</mi><mi>t</mi></msub><mspace width="0.278em"></mspace><mo>=</mo><mspace width="0.278em"></mspace><mrow><mi mathvariant="normal">min</mi><mo>&#8289;</mo></mrow><mspace width="-0.167em"></mspace><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">(</mo><msub><mi>V</mi><mi>t</mi></msub><mo>+</mo><msub><mi>O</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mtext mathvariant="normal">re-entry</mtext><mi>t</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mi>κ</mi><msub><mi>S</mi><mn>0</mn></msub><mo>,</mo><mspace width="0.278em"></mspace><mrow><mi mathvariant="normal">max</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mspace width="0.167em"></mspace><msub><mi>h</mi><mi>a</mi></msub><mi>c</mi><msub><mi>S</mi><mn>0</mn></msub><mo>−</mo><msub><mi>Q</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo minsize="120%" maxsize="120%" stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+B_t \;=\; \min\!\big(V_t + O_{t-1} - \text{re-entry}_t,\; \kappa S_0,\; \max(0,\, h_a c S_0 - Q_{t-1})\big)
+\end{equation}</annotation></semantics></math><span class="eqno">(3)</span></span> if the discount covers the redemption fee plus their cost, where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>κ</mi><annotation encoding="application/x-tex">\kappa</annotation></semantics></math> is daily arbitrage capital as a share of supply, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math> the issuer’s daily processing capacity as a share of supply, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>h</mi><mi>a</mi></msub><annotation encoding="application/x-tex">h_a</annotation></semantics></math> the number of days of capacity within which they require their claim to clear, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Q</mi><annotation encoding="application/x-tex">Q</annotation></semantics></math> the redemption queue; a suspended issuer removes the arbitrage bid entirely. The remainder stays as overhang and sets the liquidity discount. The secondary price is <span class="eq" id="eq:4"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>t</mi></msub><mspace width="0.278em"></mspace><mo>=</mo><mspace width="0.278em"></mspace><mrow><mi mathvariant="normal">max</mi><mo>&#8289;</mo></mrow><mo minsize="180%" maxsize="180%" stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mrow><mi mathvariant="normal">min</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>b</mi><mi>t</mi></msub><mo>,</mo><mover><mi>d</mi><mo accent="true">‾</mo></mover><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">[</mo><mspace width="0.167em"></mspace><msub><mi>c</mi><mi>a</mi></msub><mn>𝟏</mn><mo stretchy="false" form="prefix">[</mo><mtext mathvariant="normal">offered</mtext><mo>&gt;</mo><mn>0</mn><mo stretchy="false" form="postfix">]</mo><mo>+</mo><mi>η</mi><mspace width="0.167em"></mspace><msub><mi>O</mi><mi>t</mi></msub><mi>/</mi><msub><mi>S</mi><mn>0</mn></msub><mo>+</mo><mi>δ</mi><mspace width="0.167em"></mspace><mn>𝟏</mn><mo stretchy="false" form="prefix">[</mo><msub><mtext mathvariant="normal">suspended</mtext><mi>t</mi></msub><mo stretchy="false" form="postfix">]</mo><mo minsize="120%" maxsize="120%" stretchy="true" form="postfix">]</mo><mo>,</mo><mspace width="0.278em"></mspace><msub><mi>p</mi><mi mathvariant="normal">min</mi></msub><mo minsize="180%" maxsize="180%" stretchy="true" form="postfix">)</mo><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+p_t \;=\; \max\Big(1 - \min(b_t, \bar d) - \big[\,c_a \mathbf{1}[\text{offered}&gt;0] + \eta\, O_t/S_0 + \delta\,
+\mathbf{1}[\text{suspended}_t]\big],\; p_{\min}\Big),
+\end{equation}</annotation></semantics></math><span class="eqno">(4)</span></span> a fundamental discount equal to the expected loss share of remaining holders plus an inventory-type liquidity discount proportional to the stock of unabsorbed tokens. Arbitrage purchases join the redemption queue at par.</p>
+<h2 data-number="4.3" id="issuer"><span class="header-section-number">4.3</span> Issuer</h2>
+<p>Reserves are held in cash and deposits, overnight reverse repo, money market fund shares, bills of at most one month (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">tb1</mtext><annotation encoding="application/x-tex">\text{tb1}</annotation></semantics></math>), bills of one to three months (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">tb3</mtext><annotation encoding="application/x-tex">\text{tb3}</annotation></semantics></math>) and other assets. Impairment removes the realised loss from the least liquid assets first (other, then cash, then money market fund shares, then repo); bills are never impaired. Each day a uniform ladder matures: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">tb1</mtext><annotation encoding="application/x-tex">\text{tb1}</annotation></semantics></math> runs off into cash over 21 business days and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">tb3</mtext><annotation encoding="application/x-tex">\text{tb3}</annotation></semantics></math> rolls into <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">tb1</mtext><annotation encoding="application/x-tex">\text{tb1}</annotation></semantics></math> over 42. The issuer processes <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">min</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>Q</mi><mi>t</mi></msub><mo>,</mo><mi>c</mi><msub><mi>S</mi><mn>0</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\min(Q_t, cS_0)</annotation></semantics></math> through a waterfall: cash, repo and money market fund shares (no price impact), then bills shortest-first at the current price concession, then other assets at a 30% haircut; if the waterfall cannot raise the cash the issuer is <em>suspended</em> for the day. Liquidity management is explicit: the issuer keeps cash for the pending claims it can pay within <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>c</mi></msub><mo>=</mo><mn>5</mn></mrow><annotation encoding="application/x-tex">h_c=5</annotation></semantics></math> days and rolls the rest of the day’s maturities back into bills, so the cash buffer is spent, not rebuilt, during a run. Maturities kept as cash are bill demand <em>withdrawn</em> at auction. Net asset value marks bills at the current concession. A policy switch lets the issuer redeem at net asset value instead of par, in which case the loss is shared pro rata and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>b</mi><mi>t</mi></msub><annotation encoding="application/x-tex">b_t</annotation></semantics></math> does not grow with redemptions.</p>
+<h2 data-number="4.4" id="bill-market"><span class="header-section-number">4.4</span> Bill market</h2>
+<p>Let <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>t</mi></msub><annotation encoding="application/x-tex">C_t</annotation></semantics></math> be cumulative net demand withdrawn from the bill market, <math class="wide" display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>t</mi></msub><mo>=</mo><mrow><mi mathvariant="normal">max</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mspace width="0.167em"></mspace><msub><mi>C</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mtext mathvariant="normal">sold</mtext><mi>t</mi></msub><mo>+</mo><mi>ω</mi><mspace width="0.167em"></mspace><msub><mtext mathvariant="normal">withdrawn</mtext><mi>t</mi></msub><mo>−</mo><msub><mtext mathvariant="normal">buys</mtext><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">C_t = \max(0,\, C_{t-1} + \text{sold}_t +
+\omega\,\text{withdrawn}_t - \text{buys}_t)</annotation></semantics></math>, where a share <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ρ</mi><annotation encoding="application/x-tex">\rho</annotation></semantics></math> of each day’s redemption payments returns to bills through money market funds after a lag <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math> (buys), and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ω</mi><annotation encoding="application/x-tex">\omega</annotation></semantics></math> weights non-rollover relative to a sale. Dealer inventory <math class="wide" display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>I</mi><mi>t</mi></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="false" form="postfix">)</mo><msub><mi>I</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mtext mathvariant="normal">sold</mtext><mi>t</mi></msub><mo>−</mo><msub><mtext mathvariant="normal">buys</mtext><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">I_t = (1-\alpha) I_{t-1} + \text{sold}_t - \text{buys}_t</annotation></semantics></math> builds only from outright sales and is absorbed by other holders at rate <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>. The three-month yield deviation from its no-run path is <span class="eq" id="eq:impact"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mi>t</mi></msub><mspace width="0.278em"></mspace><mo>=</mo><mspace width="0.278em"></mspace><munder><munder><mrow><msub><mi>λ</mi><mi>P</mi></msub><mspace width="0.167em"></mspace><mi>g</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>C</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo><mspace width="0.167em"></mspace><msub><mi>m</mi><mi>t</mi></msub></mrow><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">persistent</mtext></munder><mspace width="0.278em"></mspace><mo>+</mo><mspace width="0.278em"></mspace><munder><munder><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msub><mi>κ</mi><mi>T</mi></msub><mo stretchy="false" form="postfix">)</mo><msubsup><mi>Y</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mi>T</mi></msubsup><mo>+</mo><msub><mi>λ</mi><mi>T</mi></msub><mspace width="0.167em"></mspace><mi>g</mi><mo stretchy="false" form="prefix">(</mo><msub><mtext mathvariant="normal">sold</mtext><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo><mspace width="0.167em"></mspace><msub><mi>m</mi><mi>t</mi></msub></mrow><mo accent="true">⏟</mo></munder><mtext mathvariant="normal">temporary</mtext></munder><mo>,</mo><mspace width="2.0em"></mspace><msub><mi>m</mi><mi>t</mi></msub><mo>=</mo><mn>1</mn><mo>+</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>I</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mi>/</mi><mi>K</mi><msup><mo stretchy="false" form="postfix">)</mo><mi>γ</mi></msup><mo>,</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+Y_t \;=\; \underbrace{\lambda_P\, g(C_t)\, m_t}_{\text{persistent}} \;+\; \underbrace{(1-\kappa_T) Y^T_{t-1} +
+\lambda_T\, g(\text{sold}_t)\, m_t}_{\text{temporary}}, \qquad m_t = 1 + (I_{t-1}/K)^{\gamma},
+\end{equation}</annotation></semantics></math><span class="eqno">(5)</span></span> with <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mi>q</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>q</mi></mrow><annotation encoding="application/x-tex">g(q)=q</annotation></semantics></math> for <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mo>≤</mo><msub><mi>q</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">q\le q_0</annotation></semantics></math> and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mi>q</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msqrt><mrow><msub><mi>q</mi><mn>0</mn></msub><mi>q</mi></mrow></msqrt></mrow><annotation encoding="application/x-tex">g(q)=\sqrt{q_0 q}</annotation></semantics></math> beyond the anchor flow <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>q</mi><mn>0</mn></msub><mo>=</mo><mi>$</mi><mn>3.5</mn><mspace width="0.167em"></mspace><mtext mathvariant="normal">bn</mtext></mrow><annotation encoding="application/x-tex">q_0=\$3.5\,\textrm{bn}</annotation></semantics></math> (square-root impact, the baseline), or <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mi>q</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>q</mi></mrow><annotation encoding="application/x-tex">g(q)=q</annotation></semantics></math> throughout (linear impact, the upper bound). The coefficients are anchored so that a $3.5 bn outflow raises the three-month yield by about 7 bp after ten days, the outflow elasticity reported by <span class="citation" data-cites="ahmed2025">Ahmed and Aldasoro (<a href="#ref-ahmed2025" role="doc-biblioref">2025</a>)</span> (to be verified), with buys acting at a third of that strength. The fire-sale loss on bills sold is face value times duration times the yield deviation, with durations of 0.04 and 0.17 years for the two buckets. A Fed backstop, when active from day two, removes the dealer-capacity penalty and halves the impact coefficients, a stylised Money Market Mutual Fund Liquidity Facility.</p>
+<h2 data-number="4.5" id="timing-outputs-and-experiments"><span class="header-section-number">4.5</span> Timing, outputs and experiments</h2>
+<p>Within a day: beliefs and signals update; holders exit or re-enter; exits route to the queue or the secondary market; the secondary market clears; the ladder runs off and the issuer processes the queue through the waterfall; the issuer manages liquidity; the bill market updates; losses, net asset value and all series are recorded. Each scenario is run for 1<span>,</span>000 Monte Carlo paths in the baseline and 200–300 in the grids; a path draws thresholds, private signals and common shocks, and a run is defined as cumulative redemptions of at least 20% of initial supply by day 30. Five experiments follow the pre-registered design: E1 baseline shocks on Issuer A, E2 scaling of issuer size, E3 a policy grid, E4 contagion to Issuer B, and E5 sensitivity.</p>
+<h1 data-number="5" id="sec:calib"><span class="header-section-number">5</span> Calibration and validation</h1>
+<p>Table <a href="#tab:params">6</a> in Appendix <a href="#app:params">A</a> lists every parameter with its value and source. Issuer sizes and reserve mixes are defaults from public attestations ($180 bn for Issuer A with 66% bills, 10% reverse repo, 4% money market funds, 0.5% cash and 19.5% other assets; $75 bn for Issuer B with 12% deposits and the rest in a government fund holding 40% bills and 48% repo on a look-through basis); both are flagged for verification. Market-side parameters (impact coefficients, dealer capacity, reinvestment) are anchored on the literature or set by assumption and varied in Section <a href="#sec:robust">7</a>.</p>
+<p>The behavioural and plumbing parameters that the literature does not pin down are calibrated on two episodes. The USDC episode of March 2023 is represented, for Issuer B, as an 8% exposure with no processing on business day 1 (the weekend) and resolution on day 2; targets are a trough of 0.87–0.88, redemptions of 12–15% of supply in the first week and about 25% after a month. The USDT episode of May 2022 is represented, for Issuer A, as a feared exposure resolved after ten days of successful redemptions; targets are a trough of 0.95–0.97 and redemptions of about 12% in two weeks. All targets are from memory and listed for verification. A two-stage grid fits the shared parameters (liquidity depth <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>η</mi><annotation encoding="application/x-tex">\eta</annotation></semantics></math>, a common scale on the exit thresholds, the depeg weight <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>w</mi><mn>1</mn></msub><annotation encoding="application/x-tex">w_1</annotation></semantics></math>, the loss probability <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ψ</mi><annotation encoding="application/x-tex">\psi</annotation></semantics></math> and the size of the feared USDT exposure) jointly with issuer-specific processing capacity and arbitrage capital, minimising the sum of squared standardised target errors. The best fit has <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><mo>=</mo><mn>0.1</mn></mrow><annotation encoding="application/x-tex">\eta=0.1</annotation></semantics></math>, threshold scale 1, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mn>1</mn></msub><mo>=</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">w_1=0.5</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ψ</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\psi=1</annotation></semantics></math>, a feared USDT exposure of 2%, processing capacity of 1.2% of supply per day for Issuer A and 3% for Issuer B, and arbitrage capital of 1.1% and 3% of supply per day.</p>
+<div class="tbl"><p class="tcap"><span id="tab:validation"><strong>Table 1.</strong></span> Validation against the two calibration episodes (300 paths, 10<span>,</span>000 agents). “Observed” is the target with its tolerance; <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="application/x-tex">z</annotation></semantics></math> is the model minus the observed value in units of the tolerance; days are business days. All observed values are to be verified.</p><div class="tscroll"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Episode</th>
+<th style="text-align: left;">Target</th>
+<th style="text-align: right;">Observed</th>
+<th style="text-align: right;">Model</th>
+<th style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="application/x-tex">z</annotation></semantics></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">USDC, March 2023 (Issuer B)</td>
+<td style="text-align: left;">Minimum price</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.875</mn><mo>±</mo><mn>0.010</mn></mrow><annotation encoding="application/x-tex">0.875 \pm 0.010</annotation></semantics></math></td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mn>2.9</mn></mrow><annotation encoding="application/x-tex">+2.9</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Redeemed by day 5</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>13.5</mn><mo>±</mo><mn>1.5</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">13.5 \pm 1.5\%</annotation></semantics></math></td>
+<td style="text-align: right;">12.0%</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1.0</mn></mrow><annotation encoding="application/x-tex">-1.0</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Redeemed by day 22</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>25.0</mn><mo>±</mo><mn>3.0</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">25.0 \pm 3.0\%</annotation></semantics></math></td>
+<td style="text-align: right;">24.0%</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.3</mn></mrow><annotation encoding="application/x-tex">-0.3</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;">USDT, May 2022 (Issuer A)</td>
+<td style="text-align: left;">Minimum price</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.960</mn><mo>±</mo><mn>0.015</mn></mrow><annotation encoding="application/x-tex">0.960 \pm 0.015</annotation></semantics></math></td>
+<td style="text-align: right;">0.925</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>2.3</mn></mrow><annotation encoding="application/x-tex">-2.3</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Redeemed by day 10</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>12.0</mn><mo>±</mo><mn>1.5</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">12.0 \pm 1.5\%</annotation></semantics></math></td>
+<td style="text-align: right;">12.0%</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+</tbody>
+</table></div></div>
+<figure data-latex-placement="tbp">
+<img loading="lazy" src="figures/F4_validation.png" />
+<figcaption><span id="fig:f4"><strong>Figure 1.</strong></span> Validation. Model paths (median, interquartile range and 5–95% band) for the token price and cumulative redemptions in the two calibration episodes, against the observed trough range and the observed redemptions with their tolerances (to be verified).</figcaption>
+</figure>
+<p>Table <a href="#tab:validation">1</a> and Figure <a href="#fig:f4">1</a> show the fit. Redemption volumes are matched in both episodes: 12% of USDC supply in the first week against 12–15% observed, 24% after a month against 25%, and 12% of USDT supply in two weeks. Processing capacity is the binding constraint in both, which is why the fitted capacities are low: 1.2% of supply per day is about $2 bn for Issuer A, close to what Tether actually paid out per day in May 2022, and 3% is about $2.3 bn for Issuer B. The model under-predicts the depth of the USDC trough (0.90 against 0.875) and over-predicts that of USDT (0.93 against 0.96); a single liquidity-depth parameter cannot reproduce both a thin weekend crypto market with banks closed and a deep weekday market. We report this as a limitation rather than add a weekend-specific parameter, and note that the discrepancy affects the price channel only: the bill-market results below depend on redemption volumes and timing, which are matched.</p>
+<h1 data-number="6" id="sec:results"><span class="header-section-number">6</span> Results</h1>
+<h2 data-number="6.1" id="baseline-dynamics-e1"><span class="header-section-number">6.1</span> Baseline dynamics (E1)</h2>
+<figure data-latex-placement="tbp">
+<img loading="lazy" src="figures/F1_A_baseline_dynamics.png" />
+<figcaption><span id="fig:f1"><strong>Figure 2.</strong></span> Baseline run dynamics for Issuer A (1<span>,</span>000 paths; lines are medians, bands the interquartile and 5–95% ranges; each line is labelled at its right end and lines that coincide share a label). (a) Secondary price; (b) cumulative redemptions, identical across the three loss scenarios because processing capacity binds; (c) three-month bill-yield impact; (d) cash sources that funded redemptions in the 10% loss scenario (mean path): the dashed line is cumulative redemptions paid. “Resolved day 2” is the calibrated liquidity scare: 8% of reserves exposed, resolved without loss on day 2.</figcaption>
+</figure>
+<div class="tbl"><p class="tcap"><span id="tab:e1"><strong>Table 2.</strong></span> E1 baseline, Issuer A: 1<span>,</span>000 Monte Carlo paths, 30 business days. Medians across paths unless stated. “8% exposure, resolved day 2” is the calibrated liquidity scare: no processing on day 1, exposure resolved without loss on day 2.</p><div class="tscroll"><table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">No shock</th>
+<th style="text-align: right;">5% loss</th>
+<th style="text-align: right;">10% loss</th>
+<th style="text-align: right;">20% loss</th>
+<th style="text-align: right;">8% exposure, resolved day 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="6" style="text-align: left;"><em>Run</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">  Minimum token price</td>
+<td style="text-align: right;">0.997</td>
+<td style="text-align: right;">0.872</td>
+<td style="text-align: right;">0.783</td>
+<td style="text-align: right;">0.628</td>
+<td style="text-align: right;">0.904</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Redeemed by day 7</td>
+<td style="text-align: right;">1.2%</td>
+<td style="text-align: right;">8.4%</td>
+<td style="text-align: right;">8.4%</td>
+<td style="text-align: right;">8.4%</td>
+<td style="text-align: right;">7.2%</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Redeemed by day 30</td>
+<td style="text-align: right;">2.2%</td>
+<td style="text-align: right;">36.0%</td>
+<td style="text-align: right;">35.8%</td>
+<td style="text-align: right;">35.8%</td>
+<td style="text-align: right;">19.3%</td>
+</tr>
+<tr>
+<td style="text-align: left;">  P(redemptions <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≥</mo><annotation encoding="application/x-tex">\geq</annotation></semantics></math> 20%)</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">0%</td>
+</tr>
+<tr>
+<td style="text-align: left;">  P(redemptions <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≥</mo><annotation encoding="application/x-tex">\geq</annotation></semantics></math> 50%)</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">0%</td>
+</tr>
+<tr>
+<td style="text-align: left;">  P(any suspension day)</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">0%</td>
+</tr>
+<tr>
+<td colspan="6" style="text-align: left;"><em>Treasury-bill market</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">  Peak three-month yield impact, bp</td>
+<td style="text-align: right;">4.2</td>
+<td style="text-align: right;">22.1</td>
+<td style="text-align: right;">21.2</td>
+<td style="text-align: right;">21.5</td>
+<td style="text-align: right;">17.5</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Peak impact, bp, 95th percentile</td>
+<td style="text-align: right;">5.8</td>
+<td style="text-align: right;">22.2</td>
+<td style="text-align: right;">21.3</td>
+<td style="text-align: right;">21.5</td>
+<td style="text-align: right;">17.6</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Bills sold outright, $bn</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Maturing bills not rolled, $bn</td>
+<td style="text-align: right;">3.1</td>
+<td style="text-align: right;">66.1</td>
+<td style="text-align: right;">63.5</td>
+<td style="text-align: right;">64.3</td>
+<td style="text-align: right;">33.9</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Peak net bill demand withdrawn, $bn</td>
+<td style="text-align: right;">2.1</td>
+<td style="text-align: right;">34.8</td>
+<td style="text-align: right;">32.2</td>
+<td style="text-align: right;">33.1</td>
+<td style="text-align: right;">22.0</td>
+</tr>
+<tr>
+<td colspan="6" style="text-align: left;"><em>Issuer</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">  Other assets sold, $bn</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Fire-sale and haircut loss, $bn</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Net asset value on day 30</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.923</td>
+<td style="text-align: right;">0.845</td>
+<td style="text-align: right;">0.690</td>
+<td style="text-align: right;">1.000</td>
+</tr>
+</tbody>
+</table></div></div>
+<p>Figure <a href="#fig:f1">2</a> and Table <a href="#tab:e1">2</a> show Issuer A under five shocks: no shock, a realised loss of 5, 10 or 20% of reserves, and the calibrated liquidity scare. Three features stand out. First, a realised loss of any size in this range produces a run: redemptions reach 8.4% of supply in the first week and 36% by day 30 in all three loss scenarios, and the probability of a run is one. The run is not larger because it cannot be faster: processing capacity binds for the first three weeks and arbitrage capital thereafter, so the loss scenarios differ only in price, which settles at one minus the loss share of the remaining holders minus a liquidity discount (0.87, 0.78 and 0.63 for the 5, 10 and 20% losses) and keeps drifting down as the loss concentrates on those who stay. Second, the liquidity scare looks different: the price falls to 0.90 while redemption is closed, recovers fully within two weeks as re-entering holders absorb the overhang, and redemptions stop at 19% of supply, just below the run threshold. Third, and most important for the Treasury market, the issuer sells no bills outright in any scenario. Panel (d) shows why: with processing capacity of about $2.2 bn a day and $2.8 bn of bills maturing every business day, every dollar of redemptions is paid out of run-off, and reverse repo and money market fund shares are never touched. The issuer stops rolling those maturities while it has pending claims; over the month it withholds $63 bn of auction demand in the 10% loss scenario, about half of which returns through money market funds, for a peak net demand withdrawal of $32 bn and a peak three-month yield impact of 21 bp. The fire-sale loss is zero because nothing is sold, and even where bills are sold in later experiments it stays below $10 m: a bill with six weeks to maturity sold 60 bp cheap loses seven basis points of face value. The externality falls on the Treasury market, not on the issuer.</p>
+<p>Issuer B behaves differently (Appendix <a href="#app:extra">D</a>, Table <a href="#tab:e1B">8</a>). Its reserves contain no cushion of other assets to absorb an impairment, so a realised loss hits deposits and the fund directly; with faster processing (3% a day) it pays out 80–90% of supply within the month in the loss scenarios, sells up to $8 bn of bills once repo is exhausted, and suspends in the 10% and 20% loss scenarios when the remaining holders are left with nothing. Its liquidity scare ends with 24% of supply redeemed, the USDC outcome it was calibrated to.</p>
+<h2 data-number="6.2" id="tipping-point-e2"><span class="header-section-number">6.2</span> Tipping point (E2)</h2>
+<figure data-latex-placement="tbp">
+<img loading="lazy" src="figures/F2_tipping_point.png" />
+<figcaption><span id="fig:f2"><strong>Figure 3.</strong></span> Peak three-month bill-yield impact against issuer size (log scales; lines are medians, bands 5–95% ranges, 300 paths per point). Colour gives the processing rails, daily capacity as a share of supply: calibrated (1.2%), fast (5%) or instant (20%); line style gives the price-impact function, square root (baseline) or linear (upper bound). Dotted lines mark 10, 25 and 50 bp.</figcaption>
+</figure>
+<div class="tbl"><p class="tcap"><span id="tab:e2"><strong>Table 3.</strong></span> E2: median peak three-month bill-yield impact (bp) by issuer size, and the size at which it first exceeds 10, 25 and 50 bp (log-linear interpolation). Issuer A, 300 paths per cell. Rails are daily processing capacity as a share of supply: calibrated 1.2%, fast 5%, instant 20%.</p><div class="tscroll"><table><thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+<th style="text-align: left;"></th>
+<th colspan="5" style="text-align: center;">Peak impact, bp, at issuer size</th>
+<th colspan="3" style="text-align: center;">Size at which impact first exceeds</th>
+</tr>
+<tr>
+<th style="text-align: left;">Scenario</th>
+<th style="text-align: left;">Price impact</th>
+<th style="text-align: left;">Rails</th>
+<th style="text-align: right;">1<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></th>
+<th style="text-align: right;">2<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></th>
+<th style="text-align: right;">3<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></th>
+<th style="text-align: right;">5<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></th>
+<th style="text-align: right;">10<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></th>
+<th style="text-align: right;">10 bp</th>
+<th style="text-align: right;">25 bp</th>
+<th style="text-align: right;">50 bp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Liquidity run</td>
+<td style="text-align: left;">Square root</td>
+<td style="text-align: left;">Calibrated</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;">2.0<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+<td style="text-align: right;">8.1<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Fast</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">2.5<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>10</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&gt;10\times</annotation></semantics></math></td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>10</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&gt;10\times</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Instant</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">1.3<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+<td style="text-align: right;">7.4<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>10</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&gt;10\times</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Linear</td>
+<td style="text-align: left;">Calibrated</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">88</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">220</td>
+<td style="text-align: right;">440</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;">1.1<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Fast</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">1.8<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+<td style="text-align: right;">4.4<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+<td style="text-align: right;">8.8<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Instant</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">94</td>
+<td style="text-align: right;">1.1<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+<td style="text-align: right;">2.6<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+<td style="text-align: right;">5.3<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;">Solvency run</td>
+<td style="text-align: left;">Square root</td>
+<td style="text-align: left;">Calibrated</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;">1.4<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+<td style="text-align: right;">5.5<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Fast</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;">1.9<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+<td style="text-align: right;">7.5<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Instant</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;">1.7<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+<td style="text-align: right;">6.7<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Linear</td>
+<td style="text-align: left;">Calibrated</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">129</td>
+<td style="text-align: right;">193</td>
+<td style="text-align: right;">322</td>
+<td style="text-align: right;">644</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Fast</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">95</td>
+<td style="text-align: right;">142</td>
+<td style="text-align: right;">237</td>
+<td style="text-align: right;">473</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;">1.1<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math></td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Instant</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">107</td>
+<td style="text-align: right;">160</td>
+<td style="text-align: right;">266</td>
+<td style="text-align: right;">533</td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+<td style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>1</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">&lt;1\times</annotation></semantics></math></td>
+</tr>
+</tbody>
+</table></div></div>
+<p>Figure <a href="#fig:f2">3</a> and Table <a href="#tab:e2">3</a> scale Issuer A to 2, 3, 5 and 10 times its current size, holding the bill market fixed and scaling everything on the issuer’s side (processing capacity, arbitrage capital, the ladder) with it, so that the exercise isolates the market’s capacity to absorb. Under square-root impact the peak yield effect grows with roughly the square root of size: a solvency run moves three-month yields by 21 bp today, 30 bp at twice today’s size, 47 bp at five times and 67 bp at ten times; the liquidity scare moves them by 18, 25, 39 and 55 bp. The 25 bp threshold is crossed at 1.4 times today’s size for a solvency run and 2 times for a scare; the 50 bp threshold at 5.5 and 8 times. Under linear impact, the upper bound in which every billion withdrawn costs the same two basis points, both thresholds are crossed already at today’s size and a tenfold issuer would move the front end by several hundred basis points, a dislocation that would certainly trigger intervention.</p>
+<p>Redemption speed matters, but not in the direction one might expect. Faster rails (5% or 20% of supply per day) produce <em>more</em> redemptions (52% of supply instead of 36% in a solvency run) but a <em>smaller</em> yield impact at small sizes: when the issuer can pay quickly it pays from cash and repo, the redeemed cash reaches money market funds within two days and comes back to the bill market, and the net demand withdrawn is small. Slow rails keep the issuer in a weeks-long state of pending claims in which it hoards maturities, so the slow configuration withholds $34 bn of auction demand in a scare against $18 bn with fast rails. Only with instant rails and at five to ten times today’s size does the issuer sell bills outright in volume ($24–48 bn in a scare, $27 bn in a solvency run), and even then dealer inventory never approaches its capacity because money-market-fund reinvestment buys what dealers would otherwise warehouse. The dealer-capacity channel, which dominated March 2020, is inactive in this model unless the reinvestment leak is closed (Section <a href="#sec:robust">7</a>).</p>
+<h2 data-number="6.3" id="policy-levers-e3"><span class="header-section-number">6.3</span> Policy levers (E3)</h2>
+<div class="tbl"><p class="tcap"><span id="tab:e3"><strong>Table 4.</strong></span> E3 policy grid: main effects. Each row averages the outcome over the other three levers (96 cells per configuration, 200 paths per cell). The liquidity run is at today’s size with calibrated rails; the solvency run is a 10% loss at five times today’s size with fast rails. The redemption-basis rows are single runs without other policies.</p><div class="tscroll"><table><thead>
+<tr>
+<th style="text-align: left;"></th>
+<th colspan="4" style="text-align: center;">Liquidity run, today’s size, calibrated rails</th>
+<th colspan="4" style="text-align: center;">Solvency run, 5<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math> today’s size, fast rails</th>
+</tr>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Impact, bp</th>
+<th style="text-align: right;">Redeemed by day 30</th>
+<th style="text-align: right;">Minimum price</th>
+<th style="text-align: right;">Bills sold, $bn</th>
+<th style="text-align: right;">Impact, bp</th>
+<th style="text-align: right;">Redeemed by day 30</th>
+<th style="text-align: right;">Minimum price</th>
+<th style="text-align: right;">Bills sold, $bn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="9" style="text-align: left;"><em>Minimum cash buffer, share of reserves</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">  0%</td>
+<td style="text-align: right;">7.1</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">41.3</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">153</td>
+</tr>
+<tr>
+<td style="text-align: left;">  10%</td>
+<td style="text-align: right;">4.3</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">35.2</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">65</td>
+</tr>
+<tr>
+<td style="text-align: left;">  20%</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">25.5</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">14</td>
+</tr>
+<tr>
+<td style="text-align: left;">  30%</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">14.8</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td colspan="9" style="text-align: left;"><em>Redemption fee</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">  0%</td>
+<td style="text-align: right;">2.9</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">30.3</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">63</td>
+</tr>
+<tr>
+<td style="text-align: left;">  0.5%</td>
+<td style="text-align: right;">2.9</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">29.7</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">60</td>
+</tr>
+<tr>
+<td style="text-align: left;">  1%</td>
+<td style="text-align: right;">2.9</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">29.0</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">57</td>
+</tr>
+<tr>
+<td style="text-align: left;">  2%</td>
+<td style="text-align: right;">2.8</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">27.9</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">52</td>
+</tr>
+<tr>
+<td colspan="9" style="text-align: left;"><em>Maturity cap</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">  93 days</td>
+<td style="text-align: right;">5.2</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">29.2</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr>
+<td style="text-align: left;">  180 days</td>
+<td style="text-align: right;">3.1</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">28.3</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">47</td>
+</tr>
+<tr>
+<td style="text-align: left;">  None</td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">30.1</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">125</td>
+</tr>
+<tr>
+<td colspan="9" style="text-align: left;"><em>Fed backstop</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">  Off</td>
+<td style="text-align: right;">3.8</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">39.2</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">58</td>
+</tr>
+<tr>
+<td style="text-align: left;">  On</td>
+<td style="text-align: right;">1.9</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">19.3</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">58</td>
+</tr>
+<tr>
+<td colspan="9" style="text-align: left;"><em>Redemption basis (single runs, no other policy)</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">  Par</td>
+<td style="text-align: right;">17.6</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">40.7</td>
+<td style="text-align: right;">51.9%</td>
+<td style="text-align: right;">0.747</td>
+<td style="text-align: right;">13</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Net asset value</td>
+<td style="text-align: right;">17.6</td>
+<td style="text-align: right;">19.4%</td>
+<td style="text-align: right;">0.904</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">36.9</td>
+<td style="text-align: right;">52.6%</td>
+<td style="text-align: right;">0.831</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table></div></div>
+<figure data-latex-placement="tbp">
+<img loading="lazy" src="figures/F3_policy_heatmaps.png" />
+<figcaption><span id="fig:f3"><strong>Figure 4.</strong></span> Policy grid for the solvency run at five times today’s size with fast rails, by minimum cash buffer and redemption fee (cell values are medians over 200 paths). Top: peak bill-yield impact with the 93-day maturity cap, without and with a Fed backstop (shared colour scale). Bottom: bills sold outright without a backstop, with the 93-day cap and with no cap.</figcaption>
+</figure>
+<p>Table <a href="#tab:e3">4</a> and Figure <a href="#fig:f3">4</a> evaluate four levers on a full factorial grid, plus redemption at net asset value, for a liquidity run at today’s size and a solvency run at five times today’s size with fast rails. A <em>minimum cash buffer</em> is the most powerful lever for the Treasury market: 20% of reserves in cash removes the bill-market footprint of the liquidity run entirely (from 7 bp averaged over the grid to zero), and 30% cuts the solvency run’s footprint from 41 to 15 bp and the bills sold outright from $153 bn to zero, because the buffer is spent before any bill is touched. It does nothing for the run itself: redemptions and the trough are unchanged, since they are set by beliefs and processing. A <em>maturity cap</em> trades one channel for the other: with the 93-day cap the solvency run sells $3 bn of bills and withholds the rest through non-rollover, with a 180-day cap it sells $47 bn and with no cap $125 bn, while the measured yield impact barely changes because the model prices withdrawn demand and outright sales alike. The cap therefore converts a dealer-balance-sheet event into an auction-demand event, which is a gain in orderliness that the impact metric does not reward. <em>Redemption fees</em> of up to 2% are ineffective: they shave two basis points off the impact and do not change redemptions, because a holder facing a 10% loss does not care about a 2% fee and a scare resolves before the fee binds. The <em>Fed backstop</em> halves the footprint by construction (it halves the impact coefficients), so its value in the model is the value of the assumption that a bill-purchase facility halves price impact; we include it to show the scale of what a backstop must achieve rather than as a finding. Finally, <em>redeeming at net asset value</em> rather than par, the mutual-fund rule, does not stop the run (52.6% against 51.9% redeemed) but raises the price trough from 0.75 to 0.83 and removes outright bill sales, because the loss no longer concentrates on those who stay and the incentive to be first is weaker.</p>
+<h2 data-number="6.4" id="sec:e4"><span class="header-section-number">6.4</span> Contagion (E4)</h2>
+<div class="tbl"><p class="tcap"><span id="tab:e4"><strong>Table 5.</strong></span> E4 contagion: a shock to Issuer A spills over to Issuer B’s beliefs with weight <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math> on A’s depeg (300 paths). The Issuer B columns are B’s outcomes; “combined impact” applies the persistent impact function to both issuers’ net demand withdrawn.</p><div class="tscroll"><table><thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;"></th>
+<th colspan="4" style="text-align: center;">Issuer B</th>
+<th style="text-align: right;"></th>
+</tr>
+<tr>
+<th style="text-align: left;">Shock to Issuer A</th>
+<th style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math></th>
+<th style="text-align: right;">Redeemed by day 7</th>
+<th style="text-align: right;">Redeemed by day 30</th>
+<th style="text-align: right;">Minimum price</th>
+<th style="text-align: right;">P(run)</th>
+<th style="text-align: right;">Combined impact, bp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Liquidity run</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">2.0%</td>
+<td style="text-align: right;">2.3%</td>
+<td style="text-align: right;">0.998</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">17.5</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">14.0%</td>
+<td style="text-align: right;">14.0%</td>
+<td style="text-align: right;">0.967</td>
+<td style="text-align: right;">9%</td>
+<td style="text-align: right;">17.5</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.6</td>
+<td style="text-align: right;">21.0%</td>
+<td style="text-align: right;">30.0%</td>
+<td style="text-align: right;">0.908</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">17.5</td>
+</tr>
+<tr>
+<td style="text-align: left;">Solvency run</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">2.0%</td>
+<td style="text-align: right;">2.3%</td>
+<td style="text-align: right;">0.998</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">21.2</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">21.0%</td>
+<td style="text-align: right;">70.1%</td>
+<td style="text-align: right;">0.879</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">21.3</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.6</td>
+<td style="text-align: right;">21.0%</td>
+<td style="text-align: right;">90.0%</td>
+<td style="text-align: right;">0.819</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">21.2</td>
+</tr>
+</tbody>
+</table></div></div>
+<p>Table <a href="#tab:e4">5</a> shocks Issuer A and lets Issuer B’s holders add <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math> times A’s depeg to their expected loss. With <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>0.3</mn></mrow><annotation encoding="application/x-tex">\beta=0.3</annotation></semantics></math>, a liquidity scare at A pulls 14% of B’s supply out at a trough of 0.97 and a solvency run at A pulls 70% out at 0.88; with <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>0.6</mn></mrow><annotation encoding="application/x-tex">\beta=0.6</annotation></semantics></math> B runs in every path. Yet the combined bill-market impact is indistinguishable from A’s alone, because B funds redemptions from deposits and repo and withdraws essentially no bill demand. Contagion in this model is a peg and liquidity problem for the second issuer, not an additional Treasury-market problem, as long as the second issuer’s reserves are as liquid as Issuer B’s.</p>
+<h1 data-number="7" id="sec:robust"><span class="header-section-number">7</span> Robustness</h1>
+<figure data-latex-placement="tbp">
+<img loading="lazy" src="figures/F5_sensitivity_tornado.png" />
+<figcaption><span id="fig:f5"><strong>Figure 5.</strong></span> One-at-a-time sensitivity (200 paths). Bars show the headline metric when each parameter is moved to a low (blue) or high (orange) value, holding the others at baseline; the vertical line is the baseline and an open circle marks a parameter with no measurable effect. (a) Peak bill-yield impact in the solvency run at five times today’s size with fast rails; (b) day-30 redemptions in the liquidity run at today’s size.</figcaption>
+</figure>
+<p>Figure <a href="#fig:f5">5</a> moves fifteen parameters one at a time between a low and a high value. The two panels tell complementary stories. The Treasury-market footprint of a solvency run (panel a) is governed by plumbing: the share of redeemed cash that returns to bills through money market funds moves the peak impact between 14 bp (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\rho=1</annotation></semantics></math>) and 69 bp (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\rho=0</annotation></semantics></math>); the weight of non-rollover relative to a sale moves it between 10 and 41 bp; the persistent impact coefficient between 20 and 61 bp; and arbitrage capital, which sets how fast the run can proceed, between 29 and 93 bp. The behavioural parameters (liquidity depth, thresholds, depeg and herding weights, signal noise, attention) and dealer capacity move it by less than two basis points, and the number of agents by none. The size of a liquidity run (panel b) is the mirror image: day-30 redemptions range from 7% to 20% with the threshold scale, from 10% to 20% with attention, from 7% to 19% with the loss probability <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ψ</mi><annotation encoding="application/x-tex">\psi</annotation></semantics></math> and from 13% to 20% with herding, while every market-side parameter leaves them unchanged. The model’s two halves are separable, which is also why the imperfect fit of the price trough in Section <a href="#sec:calib">5</a> does not propagate to the bill-market results.</p>
+<p>Two further checks are in the appendices. Appendix <a href="#app:benchmark">C</a> shows that with the behavioural channels off the simulation reproduces the closed-form threshold aggregate to within a tenth of a percentage point at every loss share, so the heterogeneous-threshold machinery adds dynamics without distorting the static limit. The linear-impact rows of Table <a href="#tab:e2">3</a> bound the results from above. Two robustness exercises in the pre-registered design were not run: an hourly time step for the first five days, and a global (Sobol or Morris) sensitivity design; the one-at-a-time design above is the first-order substitute and the hourly dynamics of the USDC weekend are, as the validation showed, the part of the data the model fits least well.</p>
+<h1 data-number="8" id="sec:policy"><span class="header-section-number">8</span> Policy implications</h1>
+<p>Five implications follow, each conditional on the model and on the verification of its inputs.</p>
+<p><em>The channel is auction demand, not fire sales, at today’s size.</em> An issuer with a self-liquidating bill ladder and a processing throttle meets a run by not rolling maturities. The Treasury does not face a dealer dumping bills; it faces a large buyer absent from the next several auctions. Monitoring should focus on issuers’ rollover behaviour and auction participation rather than on secondary-market sales, and the GENIUS Act’s monthly reserve reports should include ladder structure.</p>
+<p><em>Size is the problem, and the threshold is not far.</em> Under the conservative square-root assumption, a run on an issuer at one and a half to two times today’s size moves three-month yields by 25 bp, and at five to eight times by 50 bp; under linear impact those marks are crossed today. The projections of a multi-trillion sector would, in this model, put a stablecoin run in the same class as the March 2020 money market fund episode.</p>
+<p><em>Cash buffers protect the Treasury market, not the peg.</em> A 20–30% minimum cash share removes the footprint of a liquidity run and most of a solvency run’s, but changes nothing about how much is redeemed or how far the price falls. Regulators who want to protect the bill market should mandate the buffer; those who want to protect holders need the other levers.</p>
+<p><em>Net-asset-value redemption weakens the stampede.</em> Paying at net asset value rather than par is the one lever that improves the holder-side outcome, cutting the depeg by a third in a solvency run, because it removes the advantage of being first. Redemption fees do not.</p>
+<p><em>The reinvestment circuit is the key unknown.</em> Nothing in the model matters more for the Treasury market than where redeemed cash goes. If it returns to bills through money market funds within days the system is a closed circuit and the footprint is small; if it leaves for bank deposits or other assets the footprint quadruples and dealer balance sheets come into play. This is an empirical question that the 2022 and 2023 episodes can answer and that the model cannot.</p>
+<h1 data-number="9" id="sec:conclusion"><span class="header-section-number">9</span> Conclusion</h1>
+<p>We built a calibrated agent-based stress test linking stablecoin run dynamics, redemption plumbing and Treasury-bill price impact. At today’s size a run on the largest issuer moves three-month bill yields by about 20 bp through withdrawn auction demand rather than fire sales, and the issuer’s own fire-sale losses are negligible; the 25 bp mark is crossed at 1.4–2 times today’s size and the 50 bp mark at 5.5–8 times under square-root impact, and already today under linear impact. Cash buffers and maturity caps shape the Treasury-market footprint, net-asset-value redemption shapes the holder-side outcome, and fees shape neither. The model’s two halves are separable: behaviour sets the size of the run, plumbing sets its footprint.</p>
+<p>The limitations are explicit. Reserve compositions and episode targets are from memory and must be verified; the model fits redemption volumes well and price troughs less well; price impact is extrapolated from small normal-times flows with a functional form that bounds rather than pins the answer; the dealer-capacity channel is inactive unless reinvestment is slow; there are no inflows, no hourly dynamics and no bank-deposit channel; and the model has two episodes of discipline. It is a stress-testing tool whose value lies in making the channels and the orders of magnitude explicit, and in being reproducible: every number in this paper is regenerated from the repository by one command.</p>
+<h1 class="unnumbered" id="references">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-ahmed2025" class="csl-entry" role="listitem">
+Ahmed, Rashad, and Iñaki Aldasoro. 2025. <em>Stablecoins and Safe Asset Prices</em>. BIS Working Papers No. 1270. Bank for International Settlements.
+</div>
+<div id="ref-almgren2001" class="csl-entry" role="listitem">
+Almgren, Robert, and Neil Chriss. 2001. <span>“Optimal Execution of Portfolio Transactions.”</span> <em>Journal of Risk</em> 3 (2).
+</div>
+<div id="ref-anadu2023" class="csl-entry" role="listitem">
+Anadu, Kenechukwu, Pablo Azar, Marco Cipriani, et al. 2023. <em>Runs and Flights to Safety: Are Stablecoins the New Money Market Funds?</em> Staff Reports No. 1073. Federal Reserve Bank of New York.
+</div>
+<div id="ref-bis2025" class="csl-entry" role="listitem">
+Bank for International Settlements. 2025. <em>The Next-Generation Monetary and Financial System</em>. BIS Annual Economic Report 2025, Chapter III.
+</div>
+<div id="ref-barthelemy2023" class="csl-entry" role="listitem">
+Barthélemy, Jean, Paul Gardin, and Benoît Nguyen. 2023. <em>Stablecoins and the Financing of the Real Economy</em>. Working Paper No. 908. Banque de France.
+</div>
+<div id="ref-bertsch2023" class="csl-entry" role="listitem">
+Bertsch, Christoph. 2023. <em>Stablecoins: Adoption and Fragility</em>. Working Paper No. 423. Sveriges Riksbank.
+</div>
+<div id="ref-fed_mmlf2020" class="csl-entry" role="listitem">
+Board of Governors of the Federal Reserve System. 2020. <em>Money Market Mutual Fund Liquidity Facility: Terms and Conditions</em>. March 2020.
+</div>
+<div id="ref-bouchaud2018" class="csl-entry" role="listitem">
+Bouchaud, Jean-Philippe, Julius Bonart, Jonathan Donier, and Martin Gould. 2018. <em>Trades, Quotes and Prices</em>. Cambridge University Press.
+</div>
+<div id="ref-circle2023" class="csl-entry" role="listitem">
+Circle. 2023. <em>Statements on <span>USDC</span> Reserves and <span>S</span>ilicon <span>V</span>alley <span>B</span>ank Exposure, 10–13 March 2023</em>.
+</div>
+<div id="ref-circle_reserve" class="csl-entry" role="listitem">
+Circle. 2026. <em><span>USDC</span> Reserve Report and <span>C</span>ircle <span>R</span>eserve <span>F</span>und Holdings</em>. Latest monthly report; figures to be verified.
+</div>
+<div id="ref-cont2017" class="csl-entry" role="listitem">
+Cont, Rama, and Eric Schaanning. 2017. <em>Fire Sales, Indirect Contagion and Systemic Stress Testing</em>. Working Paper 2/2017. Norges Bank.
+</div>
+<div id="ref-davernas2022" class="csl-entry" role="listitem">
+<span class="nocase">d’Avernas, Adrien, Vincent Maurin, and Quentin Vandeweyer</span>. 2022. <span>“Can Stablecoins Be Stable?”</span> Unpublished manuscript.
+</div>
+<div id="ref-diamond1983" class="csl-entry" role="listitem">
+Diamond, Douglas W., and Philip H. Dybvig. 1983. <span>“Bank Runs, Deposit Insurance, and Liquidity.”</span> <em>Journal of Political Economy</em> 91 (3).
+</div>
+<div id="ref-duffie2020" class="csl-entry" role="listitem">
+Duffie, Darrell. 2020. <em>Still the World’s Safe Haven? <span>R</span>edesigning the <span>U.S.</span> <span>T</span>reasury Market After the <span>COVID</span>-19 Crisis</em>. Working Paper No. 62. Hutchins Center, Brookings.
+</div>
+<div id="ref-farmer2009" class="csl-entry" role="listitem">
+Farmer, J. Doyne, and Duncan Foley. 2009. <span>“The Economy Needs Agent-Based Modelling.”</span> <em>Nature</em> 460.
+</div>
+<div id="ref-fleming2003" class="csl-entry" role="listitem">
+Fleming, Michael J. 2003. <span>“Measuring <span>T</span>reasury Market Liquidity.”</span> <em>FRBNY Economic Policy Review</em> 9 (3).
+</div>
+<div id="ref-goldstein2005" class="csl-entry" role="listitem">
+Goldstein, Itay, and Ady Pauzner. 2005. <span>“Demand-Deposit Contracts and the Probability of Bank Runs.”</span> <em>Journal of Finance</em> 60 (3).
+</div>
+<div id="ref-gorton2023" class="csl-entry" role="listitem">
+Gorton, Gary B., and Jeffery Zhang. 2023. <span>“Taming Wildcat Stablecoins.”</span> <em>University of Chicago Law Review</em> 90 (3).
+</div>
+<div id="ref-greenwood2015" class="csl-entry" role="listitem">
+Greenwood, Robin, Augustin Landier, and David Thesmar. 2015. <span>“Vulnerable Banks.”</span> <em>Journal of Financial Economics</em> 115 (3).
+</div>
+<div id="ref-he2022" class="csl-entry" role="listitem">
+He, Zhiguo, Stefan Nagel, and Zhaogang Song. 2022. <span>“Treasury Inconvenience Yields During the <span>COVID</span>-19 Crisis.”</span> <em>Journal of Financial Economics</em> 143 (1).
+</div>
+<div id="ref-kyle1985" class="csl-entry" role="listitem">
+Kyle, Albert S. 1985. <span>“Continuous Auctions and Insider Trading.”</span> <em>Econometrica</em> 53 (6).
+</div>
+<div id="ref-li2021" class="csl-entry" role="listitem">
+Li, Lei, Yi Li, Marco Macchiavelli, and Xing Zhou. 2021. <span>“Liquidity Restrictions, Runs, and Central Bank Interventions: Evidence from Money Market Funds.”</span> <em>Review of Financial Studies</em> 34 (11).
+</div>
+<div id="ref-liao2022" class="csl-entry" role="listitem">
+Liao, Gordon Y., and John Caramichael. 2022. <em>Stablecoins: Growth Potential and Impact on Banking</em>. International Finance Discussion Papers No. 1334. Board of Governors of the Federal Reserve System.
+</div>
+<div id="ref-lyons2023" class="csl-entry" role="listitem">
+Lyons, Richard K., and Ganesh Viswanath-Natraj. 2023. <span>“What Keeps Stablecoins Stable?”</span> <em>Journal of International Money and Finance</em> 131.
+</div>
+<div id="ref-ma2023" class="csl-entry" role="listitem">
+Ma, Yiming, Yao Zeng, and Anthony Lee Zhang. 2023. <span>“Stablecoin Runs and the Centralization of Arbitrage.”</span> Unpublished manuscript.
+</div>
+<div id="ref-morris1991" class="csl-entry" role="listitem">
+Morris, Max D. 1991. <span>“Factorial Sampling Plans for Preliminary Computational Experiments.”</span> <em>Technometrics</em> 33 (2).
+</div>
+<div id="ref-morris2016" class="csl-entry" role="listitem">
+Morris, Stephen, and Hyun Song Shin. 2016. <span>“Illiquidity Component of Credit Risk.”</span> <em>International Economic Review</em> 57 (4).
+</div>
+<div id="ref-saltelli2008" class="csl-entry" role="listitem">
+Saltelli, Andrea, Marco Ratto, Terry Andres, et al. 2008. <em>Global Sensitivity Analysis: The Primer</em>. Wiley.
+</div>
+<div id="ref-shleifer2011" class="csl-entry" role="listitem">
+Shleifer, Andrei, and Robert Vishny. 2011. <span>“Fire Sales in Finance and Macroeconomics.”</span> <em>Journal of Economic Perspectives</em> 25 (1).
+</div>
+<div id="ref-tether2022" class="csl-entry" role="listitem">
+Tether. 2022. <em>Statements on Redemptions, May 2022</em>.
+</div>
+<div id="ref-tether_attest" class="csl-entry" role="listitem">
+Tether. 2026. <em>Independent Auditor’s Report on the Consolidated Reserves Report</em>. Latest quarterly attestation (BDO); figures to be verified.
+</div>
+<div id="ref-tbac2025" class="csl-entry" role="listitem">
+Treasury Borrowing Advisory Committee. 2025. <em>Discussion of Stablecoins and <span>T</span>reasury Bill Demand</em>. Presentation to the US Treasury, April/May 2025 meeting.
+</div>
+<div id="ref-genius2025" class="csl-entry" role="listitem">
+United States Congress. 2025. <em>Guiding and Establishing National Innovation for <span>U.S.</span> Stablecoins Act (<span>GENIUS</span> Act)</em>. Public Law 119-27, signed 18 July 2025.
+</div>
+<div id="ref-vissing2021" class="csl-entry" role="listitem">
+Vissing-Jorgensen, Annette. 2021. <span>“The <span>T</span>reasury Market in Spring 2020 and the Response of the <span>F</span>ederal <span>R</span>eserve.”</span> <em>Journal of Monetary Economics</em> 124.
+</div>
+</div>
+<h1 data-number="10" id="app:params"><span class="header-section-number">A</span> Parameter table</h1>
+<div class="tbl"><p class="tcap"><span id="tab:params"><strong>Table 6.</strong></span> All model parameters (from <code>config/params_default.yaml</code>, version 0.3). Where a row lists several values they are in the order named in the parameter column. “[verify]” marks values taken from memory of public sources that must be checked against the primary document.</p><div class="tscroll"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: left;">Value</th>
+<th style="text-align: left;">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="3" style="text-align: left;"><em>Issuers</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">Supply, A / B, $bn</td>
+<td style="text-align: left;">180 / 75</td>
+<td style="text-align: left;">attestations, 2026 [verify]</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reserves of A: cash / repo / MMF / bills <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≤</mo><annotation encoding="application/x-tex">\leq</annotation></semantics></math>1M / bills 1–3M / other</td>
+<td style="text-align: left;">0.5% / 10.0% / 4.0% / 33.0% / 33.0% / 19.5%</td>
+<td style="text-align: left;">attestation [verify]</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reserves of B: cash / repo / MMF / bills <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≤</mo><annotation encoding="application/x-tex">\leq</annotation></semantics></math>1M / bills 1–3M / other</td>
+<td style="text-align: left;">12.0% / 48.0% / 0.0% / 25.0% / 15.0% / 0.0%</td>
+<td style="text-align: left;">reserve report, look-through [verify]</td>
+</tr>
+<tr>
+<td style="text-align: left;">Other-asset fire-sale haircut</td>
+<td style="text-align: left;">30%</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">Bill ladder, tb1 / tb3, days</td>
+<td style="text-align: left;">21 / 42</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">Processing capacity, A / B, % of supply per day</td>
+<td style="text-align: left;">1.2% / 3.0%</td>
+<td style="text-align: left;">calibrated</td>
+</tr>
+<tr>
+<td style="text-align: left;">Arbitrage capital, A / B, % of supply per day</td>
+<td style="text-align: left;">1.1% / 3.0%</td>
+<td style="text-align: left;">calibrated</td>
+</tr>
+<tr>
+<td style="text-align: left;">Redemption fee, A / B</td>
+<td style="text-align: left;">0.1% / 0.0%</td>
+<td style="text-align: left;">issuer terms [verify]</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cash hoarding horizon, days</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td colspan="3" style="text-align: left;"><em>Treasury-bill market</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">Impact anchor flow, $bn</td>
+<td style="text-align: left;">3.5</td>
+<td style="text-align: left;">Ahmed–Aldasoro [verify]</td>
+</tr>
+<tr>
+<td style="text-align: left;">Persistent / temporary sell impact at the anchor, bp per $bn</td>
+<td style="text-align: left;">2.0 / 1.0</td>
+<td style="text-align: left;">Ahmed–Aldasoro outflow range [verify]</td>
+</tr>
+<tr>
+<td style="text-align: left;">Buy impact, bp per $bn</td>
+<td style="text-align: left;">0.5</td>
+<td style="text-align: left;">asymmetry [verify]</td>
+</tr>
+<tr>
+<td style="text-align: left;">Temporary impact decay per day</td>
+<td style="text-align: left;">0.3</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">Impact shape</td>
+<td style="text-align: left;">square root; linear below the anchor</td>
+<td style="text-align: left;">square-root law</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dealer capacity <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>, $bn / convexity <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math> / absorption per day</td>
+<td style="text-align: left;">150 / 2.0 / 0.1</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">MMF reinvestment share <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ρ</mi><annotation encoding="application/x-tex">\rho</annotation></semantics></math> / lag, days</td>
+<td style="text-align: left;">0.5 / 2</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">Duration of bills sold, tb1 / tb3, years</td>
+<td style="text-align: left;">0.04 / 0.17</td>
+<td style="text-align: left;">bucket midpoints</td>
+</tr>
+<tr>
+<td colspan="3" style="text-align: left;"><em>Holders</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">Agents <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math></td>
+<td style="text-align: left;">10,000</td>
+<td style="text-align: left;">design</td>
+</tr>
+<tr>
+<td style="text-align: left;">Type shares of supply: retail / exchange / DeFi / institutional / arbitrageur</td>
+<td style="text-align: left;">30% / 30% / 20% / 15% / 5%</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">Attention probability per day, by type</td>
+<td style="text-align: left;">0.25 / 0.70 / 0.40 / 0.50 / 1.00</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">Exit threshold mean, by type</td>
+<td style="text-align: left;">0.12 / 0.08 / 0.10 / 0.07 / 0.03</td>
+<td style="text-align: left;">calibrated (scale 1.0)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Exit threshold s.d., by type</td>
+<td style="text-align: left;">0.04 / 0.03 / 0.03 / 0.02 / 0.01</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">Signal weights <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>w</mi><mn>1</mn></msub><annotation encoding="application/x-tex">w_1</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>w</mi><mn>2</mn></msub><annotation encoding="application/x-tex">w_2</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>w</mi><mn>3</mn></msub><annotation encoding="application/x-tex">w_3</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>w</mi><mn>4</mn></msub><annotation encoding="application/x-tex">w_4</annotation></semantics></math></td>
+<td style="text-align: left;">0.5, 1.0, 0.3, 0.2</td>
+<td style="text-align: left;">calibrated / assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">Private-signal s.d. / common-shock s.d.</td>
+<td style="text-align: left;">0.02 / 0.005</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">Herding memory / re-entry hysteresis</td>
+<td style="text-align: left;">0.6 / 0.02</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">Loss probability <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ψ</mi><annotation encoding="application/x-tex">\psi</annotation></semantics></math></td>
+<td style="text-align: left;">1.0</td>
+<td style="text-align: left;">calibrated</td>
+</tr>
+<tr>
+<td style="text-align: left;">Belief spillover <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math> (E4)</td>
+<td style="text-align: left;">0, 0.3, 0.6</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+<tr>
+<td colspan="3" style="text-align: left;"><em>Secondary market</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">Liquidity depth <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>η</mi><annotation encoding="application/x-tex">\eta</annotation></semantics></math> / arbitrage cost / arbitrage horizon, days</td>
+<td style="text-align: left;">0.1 / 0.002 / 2</td>
+<td style="text-align: left;">calibrated / assumption</td>
+</tr>
+<tr>
+<td style="text-align: left;">Suspension discount / price floor</td>
+<td style="text-align: left;">0.05 / 0.5</td>
+<td style="text-align: left;">assumption</td>
+</tr>
+</tbody>
+</table></div></div>
+<h1 data-number="11" id="app:pseudo"><span class="header-section-number">B</span> Pseudo-code</h1>
+<ol>
+<li><p>Draw the population once per experiment: types, lognormal holdings within type, access flags, attention rates.</p></li>
+<li><p>For each chunk of Monte Carlo paths: initialise reserves from the reserve shares; remove the realised loss from other assets, then cash, money market fund shares and repo; draw thresholds <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\theta_i</annotation></semantics></math> and private noise <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ε</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\varepsilon_i</annotation></semantics></math>; set price <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">=1</annotation></semantics></math>, overhang, queue, herding state and dealer inventory to zero.</p></li>
+<li><p>For each business day <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>30</mn></mrow><annotation encoding="application/x-tex">t=1,\dots,30</annotation></semantics></math>:</p>
+<ol>
+<li><p>Public expected loss <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ℓ</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\ell_t</annotation></semantics></math> (exposure times the loss probability until the resolution day, realised loss thereafter); belief <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>b</mi><mi>t</mi></msub><mo>=</mo><msub><mi>ℓ</mi><mi>t</mi></msub><msub><mi>S</mi><mn>0</mn></msub><mi>/</mi><msub><mi>S</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">b_t=\ell_t S_0/S_{t-1}</annotation></semantics></math> plus any spillover; signals <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>=</mo><msub><mi>b</mi><mi>t</mi></msub><mo>+</mo><msub><mi>ε</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">x_{it}=b_t+\varepsilon_i</annotation></semantics></math>; common shock <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ν</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\nu_t</annotation></semantics></math>.</p></li>
+<li><p>Exit signal (<a href="#eq:signal">2</a>); agents who are awake and above threshold exit; exited agents whose core signal is below <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mi>i</mi></msub><mo>−</mo><mi>h</mi></mrow><annotation encoding="application/x-tex">\theta_i-h</annotation></semantics></math> request re-entry.</p></li>
+<li><p>Route exits: direct-access holdings to the queue, others to secondary sales <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>V</mi><mi>t</mi></msub><annotation encoding="application/x-tex">V_t</annotation></semantics></math>; update <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>H</mi><mi>t</mi></msub><annotation encoding="application/x-tex">H_t</annotation></semantics></math>.</p></li>
+<li><p>Arbitrage capacity from daily capital, queue room within <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>h</mi><mi>a</mi></msub><annotation encoding="application/x-tex">h_a</annotation></semantics></math> days of processing, suspension and the fee-plus-cost condition; serve re-entry demand, then arbitrage, from <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mi>t</mi></msub><mo>+</mo><msub><mi>O</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">V_t+O_{t-1}</annotation></semantics></math>; set the overhang and the price; accepted re-entrants rejoin the population pro rata.</p></li>
+<li><p>Queue <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mo>=</mo></mrow><annotation encoding="application/x-tex">+=</annotation></semantics></math> direct requests <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>+</mi><annotation encoding="application/x-tex">+</annotation></semantics></math> arbitrage purchases; ladder run-off (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">tb1</mtext><mo>→</mo></mrow><annotation encoding="application/x-tex">\text{tb1}\to</annotation></semantics></math> cash, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">tb3</mtext><mo>→</mo><mtext mathvariant="normal">tb1</mtext></mrow><annotation encoding="application/x-tex">\text{tb3}\to\text{tb1}</annotation></semantics></math>); demand <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mrow><mi mathvariant="normal">min</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>Q</mi><mi>t</mi></msub><mo>,</mo><mi>c</mi><msub><mi>S</mi><mn>0</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">=\min(Q_t, cS_0)</annotation></semantics></math> (zero on blackout days); waterfall raises demand <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>×</mi><annotation encoding="application/x-tex">\times</annotation></semantics></math> payout (par or net asset value, net of fee); shortfall <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⇒</mo><annotation encoding="application/x-tex">\Rightarrow</annotation></semantics></math> suspended; supply and queue fall by the tokens paid.</p></li>
+<li><p>Liquidity management: hoard <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mrow><mi mathvariant="normal">min</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>Q</mi><mi>t</mi></msub><mo>,</mo><msub><mi>h</mi><mi>c</mi></msub><mspace width="0.167em"></mspace><mi>c</mi><msub><mi>S</mi><mn>0</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">=\min(Q_t, h_c\, cS_0)</annotation></semantics></math>; reinvest <math class="wide" display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">min</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">matured</mtext><mo>,</mo><mrow><mi mathvariant="normal">max</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mtext mathvariant="normal">cash</mtext><mo>−</mo><mtext mathvariant="normal">hoard</mtext><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\min(\text{matured}, \max(0,\text{cash}-\text{hoard}))</annotation></semantics></math> into <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">tb1</mtext><annotation encoding="application/x-tex">\text{tb1}</annotation></semantics></math>; withdrawn <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math> matured <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>−</mi><annotation encoding="application/x-tex">-</annotation></semantics></math> reinvested.</p></li>
+<li><p>Bill market (<a href="#eq:impact">5</a>) with sold, withdrawn and the lagged reinvestment buys <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>⋅</mo><msub><mtext mathvariant="normal">paid</mtext><mrow><mi>t</mi><mo>−</mo><mi>L</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\rho\cdot\text{paid}_{t-L}</annotation></semantics></math>; fire-sale loss; mark-to-market net asset value; record all series.</p></li>
+</ol></li>
+<li><p>Metrics per path (minimum price, redemptions at days 7 and 30, peak impact, bills sold, demand withdrawn, suspension days, losses, net asset value) and summaries across paths (medians, 5th and 95th percentiles, run probabilities, threshold exceedance probabilities).</p></li>
+</ol>
+<h1 data-number="12" id="app:benchmark"><span class="header-section-number">C</span> Analytic benchmark</h1>
+<p>Consider a continuum of holders of type <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math> with supply shares <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ω</mi><mi>k</mi></msub><annotation encoding="application/x-tex">\omega_k</annotation></semantics></math>, a publicly known loss share <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math> of reserves that does not change with redemptions, private signals <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>=</mo><mi>x</mi><mo>+</mo><msub><mi>ε</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">x_i = x+\varepsilon_i</annotation></semantics></math> with <math class="wide" display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ε</mi><mi>i</mi></msub><mo>∼</mo><mi>N</mi><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\varepsilon_i\sim
+N(0,\sigma^2)</annotation></semantics></math> and exit cutoffs <math class="wide" display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>θ</mi><mi>i</mi></msub><mo>∼</mo><mi>N</mi><mo stretchy="false" form="prefix">(</mo><msub><mover><mi>θ</mi><mo accent="true">‾</mo></mover><mi>k</mi></msub><mo>,</mo><msubsup><mi>τ</mi><mi>k</mi><mn>2</mn></msubsup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\theta_i\sim N(\bar\theta_k,\tau_k^2)</annotation></semantics></math>. In the limit without herding, depeg and suspension channels, holder <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> exits within the horizon if <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>+</mo><msub><mi>ε</mi><mi>i</mi></msub><mo>&gt;</mo><msub><mi>θ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">x+\varepsilon_i&gt;\theta_i</annotation></semantics></math>, so the share of supply that exits is <span class="eq" id="eq:6"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mspace width="0.278em"></mspace><mo>=</mo><mspace width="0.278em"></mspace><munder><mo>∑</mo><mi>k</mi></munder><msub><mi>ω</mi><mi>k</mi></msub><mspace width="0.167em"></mspace><mi mathvariant="normal">Φ</mi><mspace width="-0.167em"></mspace><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>x</mi><mo>−</mo><msub><mover><mi>θ</mi><mo accent="true">‾</mo></mover><mi>k</mi></msub></mrow><msqrt><mrow><msup><mi>σ</mi><mn>2</mn></msup><mo>+</mo><msubsup><mi>τ</mi><mi>k</mi><mn>2</mn></msubsup></mrow></msqrt></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">\begin{equation}
+E(x) \;=\; \sum_k \omega_k\, \Phi\!\left(\frac{x-\bar\theta_k}{\sqrt{\sigma^2+\tau_k^2}}\right).
+\end{equation}</annotation></semantics></math><span class="eqno">(6)</span></span> In a global game with a fire-sale liquidation cost <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">c(n)</annotation></semantics></math> increasing in the exiting mass <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>, as in <span class="citation" data-cites="goldstein2005">Goldstein and Pauzner (<a href="#ref-goldstein2005" role="doc-biblioref">2005</a>)</span> and <span class="citation" data-cites="morris2016">Morris and Shin (<a href="#ref-morris2016" role="doc-biblioref">2016</a>)</span>, the equilibrium cutoff <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>θ</mi><mo>*</mo></msup><annotation encoding="application/x-tex">\theta^*</annotation></semantics></math> falls as the liquidation cost rises, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>∂</mi><msup><mi>θ</mi><mo>*</mo></msup><mi>/</mi><mi>∂</mi><mi>c</mi><mo>&lt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\partial\theta^*/\partial c&lt;0</annotation></semantics></math>: a costlier fire sale makes the run start at a smaller loss. In our model the fire-sale cost on bills is tiny because bill duration is tiny, so this amplification is absent and the cutoffs are calibrated rather than derived. Table <a href="#tab:benchmark">7</a> and Figure <a href="#fig:f6">6</a> compare the simulated exit share with <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">E(x)</annotation></semantics></math> when <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mn>1</mn></msub><mo>=</mo><msub><mi>w</mi><mn>3</mn></msub><mo>=</mo><msub><mi>w</mi><mn>4</mn></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">w_1=w_3=w_4=0</annotation></semantics></math>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>ν</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\sigma_\nu=0</annotation></semantics></math> and the belief is held fixed: the two agree to within a tenth of a percentage point.</p>
+<div class="tbl"><p class="tcap"><span id="tab:benchmark"><strong>Table 7.</strong></span> Benchmark check: share of supply exiting within 30 days in the simulation with the behavioural channels off (100 paths) against the closed-form threshold aggregate.</p><div class="tscroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">Loss share of reserves</th>
+<th style="text-align: right;">Simulation</th>
+<th style="text-align: right;">Closed form</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">1.0%</td>
+<td style="text-align: right;">1.1%</td>
+</tr>
+<tr>
+<td style="text-align: right;">2%</td>
+<td style="text-align: right;">4.2%</td>
+<td style="text-align: right;">4.3%</td>
+</tr>
+<tr>
+<td style="text-align: right;">4%</td>
+<td style="text-align: right;">11.6%</td>
+<td style="text-align: right;">11.6%</td>
+</tr>
+<tr>
+<td style="text-align: right;">6%</td>
+<td style="text-align: right;">24.0%</td>
+<td style="text-align: right;">24.0%</td>
+</tr>
+<tr>
+<td style="text-align: right;">8%</td>
+<td style="text-align: right;">40.8%</td>
+<td style="text-align: right;">40.9%</td>
+</tr>
+<tr>
+<td style="text-align: right;">10%</td>
+<td style="text-align: right;">59.0%</td>
+<td style="text-align: right;">59.0%</td>
+</tr>
+<tr>
+<td style="text-align: right;">12%</td>
+<td style="text-align: right;">74.6%</td>
+<td style="text-align: right;">74.6%</td>
+</tr>
+<tr>
+<td style="text-align: right;">15%</td>
+<td style="text-align: right;">89.9%</td>
+<td style="text-align: right;">90.0%</td>
+</tr>
+<tr>
+<td style="text-align: right;">20%</td>
+<td style="text-align: right;">98.9%</td>
+<td style="text-align: right;">98.8%</td>
+</tr>
+</tbody>
+</table></div></div>
+<figure data-latex-placement="H">
+<img loading="lazy" src="figures/F6_benchmark_check.png" />
+<figcaption><span id="fig:f6"><strong>Figure 6.</strong></span> Benchmark check: simulated exit share with the behavioural channels off against the closed-form threshold aggregate.</figcaption>
+</figure>
+<h1 data-number="13" id="app:extra"><span class="header-section-number">D</span> Additional results</h1>
+<div class="tbl"><p class="tcap"><span id="tab:e1B"><strong>Table 8.</strong></span> E1 baseline for Issuer B (1<span>,</span>000 paths). Same scenarios as Table <a href="#tab:e1">2</a>; Issuer B has no cushion of other assets, so a realised loss hits deposits and the reserve fund directly, and its processing capacity is 3% of supply per day.</p><div class="tscroll"><table>
+<thead>
+<tr>
+<th style="text-align: left;"></th>
+<th style="text-align: right;">No shock</th>
+<th style="text-align: right;">5% loss</th>
+<th style="text-align: right;">10% loss</th>
+<th style="text-align: right;">20% loss</th>
+<th style="text-align: right;">8% exposure, resolved day 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="6" style="text-align: left;"><em>Run</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">  Minimum token price</td>
+<td style="text-align: right;">0.998</td>
+<td style="text-align: right;">0.607</td>
+<td style="text-align: right;">0.500</td>
+<td style="text-align: right;">0.500</td>
+<td style="text-align: right;">0.904</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Redeemed by day 7</td>
+<td style="text-align: right;">1.9%</td>
+<td style="text-align: right;">21.0%</td>
+<td style="text-align: right;">21.0%</td>
+<td style="text-align: right;">21.0%</td>
+<td style="text-align: right;">18.0%</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Redeemed by day 30</td>
+<td style="text-align: right;">2.3%</td>
+<td style="text-align: right;">90.0%</td>
+<td style="text-align: right;">90.0%</td>
+<td style="text-align: right;">80.0%</td>
+<td style="text-align: right;">24.0%</td>
+</tr>
+<tr>
+<td style="text-align: left;">  P(redemptions <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≥</mo><annotation encoding="application/x-tex">\geq</annotation></semantics></math> 20%)</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">99%</td>
+</tr>
+<tr>
+<td style="text-align: left;">  P(redemptions <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≥</mo><annotation encoding="application/x-tex">\geq</annotation></semantics></math> 50%)</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">0%</td>
+</tr>
+<tr>
+<td style="text-align: left;">  P(any suspension day)</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">0%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">0%</td>
+</tr>
+<tr>
+<td colspan="6" style="text-align: left;"><em>Treasury-bill market</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">  Peak three-month yield impact, bp</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.6</td>
+<td style="text-align: right;">8.6</td>
+<td style="text-align: right;">12.6</td>
+<td style="text-align: right;">1.8</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Peak impact, bp, 95th percentile</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.6</td>
+<td style="text-align: right;">8.6</td>
+<td style="text-align: right;">12.6</td>
+<td style="text-align: right;">1.8</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Bills sold outright, $bn</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.4</td>
+<td style="text-align: right;">4.3</td>
+<td style="text-align: right;">7.7</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Maturing bills not rolled, $bn</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">25.9</td>
+<td style="text-align: right;">25.7</td>
+<td style="text-align: right;">22.3</td>
+<td style="text-align: right;">7.1</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Peak net bill demand withdrawn, $bn</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">4.7</td>
+<td style="text-align: right;">0.9</td>
+</tr>
+<tr>
+<td colspan="6" style="text-align: left;"><em>Issuer</em></td>
+</tr>
+<tr>
+<td style="text-align: left;">  Other assets sold, $bn</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+<td style="text-align: right;">0.0</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Fire-sale and haircut loss, $bn</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr>
+<td style="text-align: left;">  Net asset value on day 30</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.500</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: right;">1.000</td>
+</tr>
+</tbody>
+</table></div></div>
+<figure data-latex-placement="H">
+<img loading="lazy" src="figures/F1_B_baseline_dynamics.png" />
+<figcaption><span id="fig:f1b"><strong>Figure 7.</strong></span> Baseline run dynamics for Issuer B (1<span>,</span>000 paths), panels as in Figure <a href="#fig:f1">2</a>.</figcaption>
+</figure>
+</article>
+<section class="cite" aria-label="How to cite"><h2>How to cite</h2><pre><code>@unpublished{chongmankhong2026stablerun,
+  author = {Chongmankhong, Thanatchon},
+  title  = {When Stablecoins Run: Fire-Sale Spillovers to the Treasury Bill Market. An Agent-Based Stress Test},
+  note   = {Working paper and code repository},
+  year   = {2026},
+  doi    = {10.5281/zenodo.23996044},
+  url    = {https://thanatchon36.github.io/stablerun/paper/}
+}</code></pre></section>
+<footer class="colophon">
+<p>Preliminary working paper, November 2026. Comments welcome. Replication code, configuration and every table in this paper are reproducible from the accompanying <code>stablerun</code> repository, <a href="https://github.com/thanatchon36/stablerun" class="uri">https://github.com/thanatchon36/stablerun</a>, archived at <a href="https://doi.org/10.5281/zenodo.23996044">doi:10.5281/zenodo.23996044</a>; the simulation outputs are at <a href="https://huggingface.co/datasets/thanatchon36/stablerun" class="uri">https://huggingface.co/datasets/thanatchon36/stablerun</a>. Institutional figures used for calibration and the references cited here were compiled without access to primary sources and are listed in the repository for verification; they should be checked before this paper is cited. The model is a stress-testing tool, not a forecast.</p>
+<p>Rendered from <code>paper/main.tex</code> by <code>scripts/build_web_paper.py</code>. The headline numbers above are read from <code>results/tables/</code>. The PDF is authoritative.</p>
+</footer>
+</div>
+</body>
+</html>

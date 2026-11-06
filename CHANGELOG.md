@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Web reader for the paper at <https://thanatchon36.github.io/stablerun/paper/>, built from the LaTeX source by
+  `scripts/build_web_paper.py` and served from `docs/` by GitHub Pages. No result or paper text changed.
+
 ## v0.3.1 (2026-11-06)
 
 - Paper and README: redeeming at net asset value rather than par **cuts the depeg by a third**, not by half. In the

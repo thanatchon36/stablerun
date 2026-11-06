@@ -8,11 +8,13 @@ Thanatchon Chongmankhong · Working paper, November 2026</p>
 ![Status](https://img.shields.io/badge/status-working%20paper-orange)
 ![Python](https://img.shields.io/badge/python-%E2%89%A53.10-blue)
 ![Tests](https://img.shields.io/badge/tests-21%20passing-brightgreen)
+[![Paper: read online](https://img.shields.io/badge/paper-read%20online-b2182b)](https://thanatchon36.github.io/stablerun/paper/)
 [![PDF](https://img.shields.io/badge/paper-PDF-b2182b)](https://github.com/thanatchon36/stablerun/raw/main/paper.pdf)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23996044.svg)](https://doi.org/10.5281/zenodo.23996044)
 [![Data](https://img.shields.io/badge/data-Hugging%20Face-ffcc4d)](https://huggingface.co/datasets/thanatchon36/stablerun)
 
+📖 **[Read the paper online](https://thanatchon36.github.io/stablerun/paper/)** ·
 ⬇️ **[Download the PDF](https://github.com/thanatchon36/stablerun/raw/main/paper.pdf)** ·
 📝 **[Research proposal](docs/proposal.md)** ·
 ⚙️ **[Parameters](config/params_default.yaml)** ·
@@ -65,7 +67,8 @@ Other flags: `--paths` (Monte Carlo paths), `--seed`, `--impact sqrt|linear`, `-
 
 ## Research: *When Stablecoins Run* (2026)
 
-The paper is [`paper.pdf`](paper.pdf) (23 pages, November 2026 draft), with LaTeX source in [`paper/`](paper/).
+The paper is [`paper.pdf`](paper.pdf) (23 pages, November 2026 draft), with LaTeX source in [`paper/`](paper/) and a
+[web version](https://thanatchon36.github.io/stablerun/paper/) with the same text and numbers.
 It answers three questions: how large the Treasury-market spillover of a run is and through which channel, at what
 sector size it becomes systemic, and which policy levers work. The model is calibrated to the USDC episode of
 March 2023 and the USDT episode of May 2022, and it nests a closed-form threshold benchmark that the simulation
@@ -86,6 +89,7 @@ python scripts/run_all.py --experiment all        # E1 (A and B), E2–E5, bench
 python scripts/run_all.py --experiment calibrate  # optional: re-fit the behavioural parameters
 cd paper && latexmk -pdf main.tex                 # rebuild the paper (or: tectonic main.tex)
 bash paper/make_arxiv.sh                          # arXiv bundle paper/arxiv.tar.gz (needs tectonic)
+python scripts/build_web_paper.py                 # web reader docs/paper/ from the LaTeX source (needs pandoc)
 ```
 
 Figures follow one house style (`src/stablerun/style.py`): Pagella text to match the paper, the Okabe–Ito
@@ -117,7 +121,7 @@ scripts/          run_all.py (CLI), make_tables.py (LaTeX tables), make_hf_datas
 tests/            pytest suite
 results/          figures (PDF and PNG) and tables (Markdown and CSV) for every experiment
 paper/            LaTeX source, bibliography, figures and tables; make_arxiv.sh builds the arXiv bundle
-docs/             proposal, phase notes, references to verify, LinkedIn post, card and poster (scripts/make_linkedin_card.py, make_linkedin_poster.py), logo
+docs/             web reader (docs/paper/, served by GitHub Pages), proposal, phase notes, references to verify, LinkedIn post, card and poster (scripts/make_linkedin_card.py, make_linkedin_poster.py), logo
 ```
 
 ## Honesty and limitations
