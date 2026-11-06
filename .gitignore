@@ -19,3 +19,4 @@ results/phase3.log
 paper/arxiv.tar.gz
 .venv/
 .tools/
+build/

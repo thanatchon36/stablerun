@@ -29,6 +29,8 @@ most important unknown is how much redeemed cash returns to bills through money 
 
 Working paper, code and every table and figure reproducible with one command:
 https://github.com/thanatchon36/stablerun
+Archived release: https://doi.org/10.5281/zenodo.23996044
+All 10,000 Monte Carlo paths and every experiment table: https://huggingface.co/datasets/thanatchon36/stablerun
 
 Caveats up front: the institutional inputs are flagged for verification, the model fits redemption volumes well
 and price troughs less well, and it is a stress-testing tool, not a forecast. Feedback very welcome.
@@ -47,5 +49,6 @@ auction, not a seller in a fire sale. At 1.4-2x today's size the 25 bp mark is c
 Treasury market, NAV redemption protects holders, fees protect nobody.
 
 Paper + fully reproducible code: https://github.com/thanatchon36/stablerun
+Data: https://huggingface.co/datasets/thanatchon36/stablerun · DOI: 10.5281/zenodo.23996044
 
 #stablecoins #TreasuryBills #FinancialStability

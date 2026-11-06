@@ -13,6 +13,7 @@ authors:
   - family-names: Chongmankhong
     given-names: Thanatchon
 version: 0.3.0
+doi: 10.5281/zenodo.23996044
 date-released: 2026-11-06
 license: MIT
 repository-code: "https://github.com/thanatchon36/stablerun"

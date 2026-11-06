@@ -8,12 +8,24 @@
     }
   ],
   "license": "mit",
-  "keywords": ["stablecoins", "Treasury bills", "fire sales", "agent-based model", "financial stability", "stress testing"],
+  "keywords": [
+    "stablecoins",
+    "Treasury bills",
+    "fire sales",
+    "agent-based model",
+    "financial stability",
+    "stress testing"
+  ],
   "related_identifiers": [
     {
       "identifier": "https://github.com/thanatchon36/stablerun/raw/main/paper.pdf",
       "relation": "isDocumentedBy",
       "resource_type": "publication-workingpaper"
+    },
+    {
+      "identifier": "https://huggingface.co/datasets/thanatchon36/stablerun",
+      "relation": "isSupplementedBy",
+      "resource_type": "dataset"
     }
   ]
 }
