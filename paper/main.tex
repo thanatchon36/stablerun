@@ -1,0 +1,91 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[sc]{mathpazo}
+\linespread{1.08}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs,array}
+\usepackage[round]{natbib}
+\usepackage[font=small,labelfont=bf,labelsep=period,justification=justified]{caption}
+\usepackage{placeins}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=navy,citecolor=navy,urlcolor=navy]{hyperref}
+\definecolor{navy}{RGB}{0,51,102}
+\renewcommand{\arraystretch}{1.12}
+\graphicspath{{figures/}}
+\newcommand{\bn}{\textrm{bn}}
+\newcommand{\bp}{\textrm{bp}}
+
+% section headings
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.6em}{0.7em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.5em}
+
+% running head
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\itshape Chongmankhong --- When Stablecoins Run}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+\title{\LARGE\bfseries When Stablecoins Run:\\[0.15em] Fire-Sale Spillovers to the Treasury Bill Market\\[0.6em]
+\large\mdseries An Agent-Based Stress Test}
+\author{\large Thanatchon Chongmankhong\thanks{Preliminary working paper, November 2026. Comments welcome.
+Replication code, configuration and every table in this paper are reproducible from the accompanying
+\texttt{stablerun} repository. Institutional figures used for calibration and the references cited here were
+compiled without access to primary sources and are listed in the repository for verification; they should be
+checked before this paper is cited. The model is a stress-testing tool, not a forecast.}}
+\date{\normalsize November 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{plain}
+
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\small
+\begin{center}\textbf{Abstract}\end{center}
+\noindent Payment stablecoins have become large holders of US Treasury bills, and the GENIUS Act of 2025 will push
+their reserves further into bills of 93 days or less. We build an agent-based stress test in which heterogeneous
+holders exit on private signals, a visible depeg and peer behaviour; only authorised redeemers reach the issuer at
+par, while everyone else sells on a secondary market where capital-constrained arbitrageurs convert discounts into
+redemptions; the issuer pays through a liquidation waterfall and the bill market absorbs outright sales and
+withdrawn auction demand with permanent and temporary price impact. Calibrated to the USDC episode of March 2023
+and the USDT episode of May 2022, the model yields three results. First, at today's size a run on the largest
+issuer moves three-month bill yields by roughly 20\,bp and sells essentially no bills outright: redemptions are
+throttled by processing capacity and funded by run-off, so the externality takes the form of demand withdrawn at
+auction rather than a fire sale, and the issuer's own fire-sale losses are negligible because bill duration is
+tiny. Second, scaling the sector, the 25\,bp mark is crossed at roughly 1.4--2 times today's size and the 50\,bp
+mark at 5.5--8 times under square-root price impact; under linear impact (an upper bound) both are crossed
+already today. Third, a cash buffer of 20--30\% of reserves removes the bill-market footprint of a liquidity run
+and cuts that of a solvency run by two thirds; maturity caps convert outright sales into non-rollover; redemption
+fees are ineffective; redeeming at net asset value rather than par halves the depeg. The single most important
+unknown is how much redeemed cash returns to bills through money market funds.
+
+\medskip
+\noindent\textbf{Keywords:} stablecoins; Treasury bills; bank runs; fire sales; agent-based models; financial stability.\\
+\textbf{JEL codes:} G01, G21, G23, E58.
+\end{minipage}
+\end{center}
+\vspace{0.5em}
+
+\input{part1}
+\input{part2}
+
+\FloatBarrier
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\FloatBarrier
+\appendix
+\titleformat{\section}{\large\bfseries}{Appendix \thesection.}{0.6em}{}
+\input{appendix}
+
+\end{document}

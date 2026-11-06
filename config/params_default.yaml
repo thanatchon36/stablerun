@@ -1,0 +1,171 @@
+# Default parameters for the stablecoin-run / T-bill fire-sale ABM.
+# Units: USD billions unless stated. Every value tagged VERIFY must be confirmed
+# against the primary source before the final run. confidence: high | med | low
+# Phase 0 values approved 2026-11-05 (D1 defaults, D2 sqrt impact, D3 Issuer A/B naming).
+# Phase 1 additions (all assumptions, to be calibrated in Phase 2): attention rates,
+# holding dispersion, herding memory, two-component depeg, bill ladder, dealer absorption.
+
+meta:
+  version: "0.3-phase2-calibrated"
+  currency_unit: "USD bn"
+  time_step: "day"            # business days; "hour" for the intraday robustness run
+  horizon_days: 30
+  monte_carlo_paths: 1000
+  seed: 20261105
+
+issuers:
+  A:                          # large offshore issuer (calibration source: Tether attestations, VERIFY)
+    supply: 180.0             # VERIFY mid-2026; confidence: low
+    reserves:                 # shares of total assets, must sum to 1
+      cash_deposits: 0.005    # VERIFY; confidence: med
+      reverse_repo: 0.10
+      mmf_shares: 0.04
+      tbills_le_1m: 0.33
+      tbills_1_3m: 0.33
+      other: 0.195            # BTC, gold, secured loans, bonds
+    other_asset_haircut: 0.30
+    cash_hoard_days: 5          # cash kept for pending claims = min(queue, days x daily cap); liquidity-management assumption, varied in E5
+    ladder_days:              # business days for a bucket to mature fully (uniform ladder)
+      tb1: 21
+      tb3: 42
+    redemption:
+      direct_access_types: [institutional, arbitrageur]
+      minimum: 0.0001         # $100k, VERIFY issuer terms
+      fee: 0.001              # 0.1%, VERIFY
+      processing_cap_share_per_day: 0.012   # ~$5bn/day at $180bn; assumption anchored on USDC 13 Mar 2023 (VERIFY)
+      arbitrage_capital_share_per_day: 0.011  # ~$2bn/day; assumption, low
+  B:                          # US-regulated issuer (calibration source: Circle reserve reports, VERIFY)
+    supply: 75.0              # VERIFY mid-2026; confidence: low
+    reserves:                 # look-through of the reserve fund
+      cash_deposits: 0.12     # VERIFY; confidence: med
+      reverse_repo: 0.48
+      mmf_shares: 0.0
+      tbills_le_1m: 0.25
+      tbills_1_3m: 0.15
+      other: 0.0
+    other_asset_haircut: 0.30
+    cash_hoard_days: 5          # cash kept for pending claims = min(queue, days x daily cap); liquidity-management assumption, varied in E5
+    ladder_days:
+      tb1: 21
+      tb3: 42
+    redemption:
+      direct_access_types: [institutional, arbitrageur]
+      minimum: 0.0
+      fee: 0.0
+      processing_cap_share_per_day: 0.03    # ~$5bn/day at $75bn; USDC processed ~$3.8bn on 13 Mar 2023 (VERIFY)
+      arbitrage_capital_share_per_day: 0.03
+
+bill_market:
+  bills_outstanding: 6500.0         # VERIFY Treasury 2026; confidence: med
+  daily_volume: 250.0               # VERIFY TRACE; confidence: med
+  duration_years:                   # average duration of bills sold from each bucket
+    tb1: 0.04
+    tb3: 0.17
+  impact:
+    reference_flow: 3.5             # flow size (bn) at which elasticities are anchored (Ahmed & Aldasoro 2025, VERIFY)
+    sell_permanent_bp_per_bn: 2.0   # applied to g(cumulative net sales); with temporary term gives ~7 bp for a $3.5bn outflow after 10 days (A&A 2025 outflow range, VERIFY)
+    sell_temporary_bp_per_bn: 1.0   # applied to g(daily sales), decays
+    buy_bp_per_bn: 0.5              # inflow asymmetry, VERIFY A&A 2025
+    temporary_decay_per_day: 0.3
+    runoff_weight: 1.0              # weight of non-rolled maturities in net demand withdrawn (1 = same as a sale; varied in E5)
+    functional_form: sqrt           # sqrt = linear below the anchor, square-root above (baseline, approved D2) | linear (upper bound) | pure_sqrt
+  dealers:
+    capacity_K: 150.0               # cumulative inventory before convex penalty; assumption, low
+    convexity_gamma: 2.0
+    absorption_per_day: 0.10        # share of dealer inventory taken by other holders each day; assumption
+  reinvestment:
+    share_rho: 0.5                  # share of redeemed cash returning to bills via MMFs; assumption
+    lag_days: 2
+
+holders:
+  n_agents: 10000
+  type_shares:                      # shares of supply; assumption, low
+    retail: 0.30
+    exchange_mm: 0.30
+    defi: 0.20
+    institutional: 0.15
+    arbitrageur: 0.05
+  type_agent_counts:                # shares of agents (many small retail, few large institutions)
+    retail: 0.60
+    exchange_mm: 0.10
+    defi: 0.10
+    institutional: 0.15
+    arbitrageur: 0.05
+  holding_dispersion:               # lognormal sigma of holdings within type
+    retail: 1.5
+    exchange_mm: 1.0
+    defi: 1.0
+    institutional: 1.0
+    arbitrageur: 0.8
+  attention:                        # probability an agent reconsiders on a given day
+    retail: 0.25
+    exchange_mm: 0.70
+    defi: 0.40
+    institutional: 0.50
+    arbitrageur: 1.00
+  exposure_loss_probability: 1.0    # psi: market-assessed probability that an unresolved exposure becomes a loss; calibrated Phase 2
+  signal_noise_sigma: 0.02          # private-signal noise on the loss share; assumption, varied in E5
+  aggregate_noise_sigma: 0.005      # common daily sentiment shock added to every signal; assumption, varied in E5
+  run_signal_weights:               # s = w1*(1-p) + w2*x_i + w3*H + w4*suspended
+    w1_depeg: 0.5  # calibrated Phase 2
+    w2_private: 1.0
+    w3_herding: 0.3
+    w4_suspension: 0.2
+  herding_memory: 0.6               # H_t = memory*H_{t-1} + (exit flow_t / S0)
+  reentry_hysteresis: 0.02          # exited holders re-enter when s_i < threshold - hysteresis; assumption
+  thresholds:                       # type-specific mean / sd of the exit threshold; calibrated in Phase 2
+    retail: {mean: 0.12, sd: 0.04}
+    exchange_mm: {mean: 0.08, sd: 0.03}
+    defi: {mean: 0.1, sd: 0.03}
+    institutional: {mean: 0.07, sd: 0.02}
+    arbitrageur: {mean: 0.03, sd: 0.01}
+  threshold_floor: 0.005
+
+secondary_market:
+  fundamental_weight: 1.0           # discount = weight * public expected loss share of remaining holders
+  liquidity_depth_eta: 0.1  # calibrated Phase 2 (was 0.2)
+  arbitrage_cost: 0.002             # 0.2%; minimum discount at which arbitrageurs buy
+  arbitrage_horizon_days: 2         # arbitrageurs buy only if the queue clears within this many days
+  suspension_discount: 0.05
+  price_floor: 0.5
+  max_fundamental_discount: 0.5
+
+contagion:
+  belief_spillover_beta: 0.3        # assumption; varied in E4
+
+shocks:
+  e1_scenarios:                     # exposure = share of reserves at risk; realized_share = fraction actually lost
+    - {name: control, exposure: 0.00, realized_share: 1.0, resolution_day: null}
+    - {name: loss05,  exposure: 0.05, realized_share: 1.0, resolution_day: null}
+    - {name: loss10,  exposure: 0.10, realized_share: 1.0, resolution_day: null}
+    - {name: loss20,  exposure: 0.20, realized_share: 1.0, resolution_day: null}
+    - {name: scare08, exposure: 0.08, realized_share: 0.0, resolution_day: 2, blackout_days: 1}   # USDC-2023-like: weekend without processing, exposure resolved without loss
+  size_multipliers: [1, 2, 5, 10]
+
+policy_grid:
+  cash_buffer: [0.0, 0.10, 0.20, 0.30]
+  redemption_fee: [0.0, 0.005, 0.01, 0.02]
+  maturity_cap_days: [93, 180, null]
+  fed_backstop: [false, true]
+  backstop:
+    start_day: 2
+    impact_multiplier: 0.5
+    capacity_unbounded: true
+
+metrics:
+  run_threshold: 0.20               # cumulative redemptions by day 30 that count as a run
+  severe_run_threshold: 0.50
+  yield_thresholds_bp: [10, 25, 50]
+
+validation_targets:                 # all VERIFY
+  usdc_2023_03:
+    price_trough: [0.87, 0.88]
+    week1_redemption_share: [0.12, 0.15]
+    day30_redemption_share: 0.25
+  usdt_2022_05:
+    price_trough: 0.95
+    week2_redemption_share: 0.12
+  mmf_2020_03:
+    outflow_bn: 125.0
+    outflow_share: 0.15
+    backstop_day: 10

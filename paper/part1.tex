@@ -1,0 +1,223 @@
+\section{Introduction}
+
+Payment stablecoins are money-like liabilities backed by portfolios that look increasingly like those of
+government money market funds. The two largest issuers alone report well over \$200\,bn of US Treasury bills,
+reverse repo and government money market fund shares, and the GENIUS Act signed in July 2025 confines permitted
+reserve assets to cash, insured deposits, bills with no more than 93 days to maturity, Treasury-backed repo and
+government money market funds \citep[][all institutional figures used in this paper are listed for verification in
+the repository]{genius2025}. A growing empirical literature documents that stablecoin flows already move the front
+end of the Treasury curve in normal times \citep{ahmed2025}, and the Treasury Borrowing Advisory Committee has
+discussed stablecoins as a structural source of bill demand \citep{tbac2025}.
+
+What happens to that demand when a stablecoin runs? Two episodes give partial answers. In May 2022 Tether redeemed
+roughly a tenth of its supply in two weeks after the collapse of Terra, with a brief and shallow depeg. In March
+2023 USDC fell to about 88 cents over a weekend after Circle disclosed that \$3.3\,bn of its reserves sat at
+Silicon Valley Bank, recovered within two days once deposits were guaranteed, and still lost about a quarter of
+its supply over the following month \citep{circle2023,tether2022}. Neither episode disturbed the bill market, but
+neither involved an issuer of today's size, let alone the multiples that industry projections contemplate. The
+question this paper asks is quantitative: when a run happens, how much bill-market dislocation does the forced
+liquidation of reserves cause, through which channel, and at what sector size does it become a financial-stability
+concern?
+
+Two episodes are too few for econometrics, so we answer with a calibrated agent-based model. Holders are
+heterogeneous in size, information, attention and access to the issuer: institutions and arbitrageurs can redeem
+at par, retail and most exchanges can only sell on a secondary market. Exit decisions follow a global-games-style
+threshold rule on a private signal about reserve impairment, a visible depeg, peer behaviour and a suspension
+flag. The secondary price carries a fundamental discount (the expected loss share of whoever remains) and a
+liquidity discount proportional to the stock of tokens that arbitrageurs have not yet absorbed. The issuer pays
+redemptions through a waterfall (cash, repo, money market fund shares, bills shortest-first, other assets at a
+haircut), subject to a daily processing capacity, and manages liquidity by keeping cash for pending claims and
+rolling the rest of its maturing bills. The bill market absorbs outright sales and demand withdrawn at auction
+with a persistent and a temporary impact component, a dealer-capacity penalty and a reinvestment leak through
+which redeemed cash returns via money market funds. A second issuer receives a belief spillover from the first.
+The model nests a closed-form threshold aggregate when the behavioural channels are switched off, and we show
+that the simulation reproduces it exactly.
+
+Our contribution is threefold. First, we quantify the spillover and identify its channel. At today's size a run on
+the largest issuer, whether a liquidity scare or a 10\% loss of reserves, moves three-month bill yields by
+17--21\,bp in the model, and the issuer sells no bills outright: with processing capacity of about 1.2\% of
+supply per day, redemptions are funded entirely by the \$2.8\,bn a day of maturing bills. The externality is
+demand withdrawn at auction, not a fire sale, and the issuer's fire-sale loss is negligible because the bills it
+would sell have a duration of weeks. Second, we turn ``stablecoins might be systemic one day'' into a number. Under
+square-root impact, the 25\,bp threshold is crossed at 1.4--2 times today's size and the 50\,bp threshold at
+5.5--8 times; under linear impact, the upper bound, both are crossed already today. Third, we rank levers. A
+minimum cash buffer of 20--30\% removes the footprint of a liquidity run and cuts that of a solvency run by about
+two thirds; the 93-day maturity cap converts outright sales into orderly non-rollover; redemption fees do
+little; redeeming at net asset value rather than par halves the depeg; a Fed backstop that halves impact halves
+the footprint by construction. Sensitivity analysis shows a clean separation: the size of a run is governed by
+behavioural parameters (thresholds, attention, the perceived probability of loss), whereas its Treasury-market
+footprint is governed by plumbing (how much redeemed cash returns to bills, arbitrage capital, the accounting of
+non-rollover) and barely by behaviour at all.
+
+The rest of the paper proceeds as follows. Section~\ref{sec:background} sets out the institutional mechanics.
+Section~\ref{sec:lit} relates the paper to the literature. Section~\ref{sec:model} presents the model,
+Section~\ref{sec:calib} its calibration and validation, Section~\ref{sec:results} the results,
+Section~\ref{sec:robust} robustness, Section~\ref{sec:policy} policy implications. Section~\ref{sec:conclusion}
+concludes. Appendices give the parameter table, pseudo-code and additional figures. Code, configuration and every
+table in this paper are reproducible from the repository with one command.
+
+\section{Institutional background}\label{sec:background}
+
+\paragraph{Redemption mechanics.} A payment stablecoin is a token redeemable at par from its issuer, but direct
+redemption is available only to verified counterparties above a minimum size: for the largest offshore issuer,
+verified customers with a minimum of \$100,000 and a 0.1\% fee; for the largest US-regulated issuer, institutional
+customers of its minting platform \citep{tether_attest,circle_reserve}. Everyone else obtains dollars by selling the
+token on exchanges. The peg is therefore maintained by arbitrageurs who buy discounted tokens on the secondary
+market and redeem them at par, and the depth of that arbitrage is bounded by their capital and by the issuer's
+processing capacity \citep{ma2023,lyons2023}. During the USDC weekend of March 2023, redemption was unavailable
+because banks were closed, arbitrage capital stood aside, and the secondary price cleared at a discount of about
+twelve cents. Once redemption resumed and the Silicon Valley Bank exposure was resolved, the discount closed in a
+day, but holders who had decided to leave kept redeeming through the following weeks.
+
+\paragraph{Reserve rules.} The GENIUS Act requires one-for-one backing in US coins and currency, insured deposits,
+Treasury bills with at most 93 days to maturity, Treasury-backed repo and reverse repo, shares of government money
+market funds invested in the same assets, and central bank reserves; issuers must publish monthly reserve reports
+and disclose their redemption policy, and may not pay interest to holders \citep{genius2025}. Issuer attestations at
+mid-2026 report reserve mixes that already resemble this list: the largest offshore issuer holds roughly two thirds
+of its assets in bills directly, with reverse repo, money market fund shares and a residual of other assets
+(bitcoin, gold, secured loans); the largest US-regulated issuer holds about an eighth in bank deposits and the rest
+in a government money market fund that invests in short bills and overnight repo \citep{tether_attest,circle_reserve}.
+These are the two reserve profiles we model as ``Issuer~A'' and ``Issuer~B''; the figures are defaults from public
+reports as remembered by the authors and must be replaced with the latest attestation before publication.
+
+\paragraph{The bill market.} Treasury bills outstanding are of the order of \$6--7\,tn, with daily trading volume
+in the hundreds of billions; money market funds and foreign official holders are the largest holders, and primary
+dealers intermediate secondary trading subject to balance-sheet constraints that proved binding in March 2020
+\citep{duffie2020,vissing2021,he2022}. Two features matter for a stablecoin run. First, bills are the most liquid
+instrument in the world, so the price impact of even large flows is measured in basis points, not percent; the
+empirical elasticity of three-month bill yields to stablecoin flows is a few basis points per \$3--4\,bn over ten
+days, with outflows mattering more than inflows \citep{ahmed2025}. Second, a bill portfolio self-liquidates: a
+\$120\,bn ladder of bills with an average maturity of one to two months returns about \$3\,bn of cash every
+business day without any sale. An issuer facing redemptions can meet them by not rolling its maturities, which
+withdraws demand at auction rather than adding supply in the secondary market. Both channels affect yields; only
+the second is a fire sale in the usual sense, and only the second touches dealer balance sheets.
+
+\paragraph{The March 2020 analogue.} Prime money market funds lost about 15\% of assets in two weeks in March
+2020, sold commercial paper and bills into dislocated markets, and were backstopped by the Money Market Mutual Fund
+Liquidity Facility after ten days \citep{li2021,fed_mmlf2020}. We use this episode to discipline the behaviour of
+other bill holders and the design of the backstop lever.
+
+\section{Related literature}\label{sec:lit}
+
+The paper sits at the intersection of three literatures. The first studies stablecoin runs. \citet{gorton2023}
+argue that privately issued stablecoins are the wildcat banknotes of our time; \citet{anadu2023} document that
+stablecoin flows during 2022--23 resembled money market fund runs and flights to safety; \citet{ma2023} show that
+the centralisation of arbitrage, which we model as a capital- and capacity-constrained arbitrage bid, trades off
+peg stability against run risk; \citet{lyons2023} study what keeps the peg; \citet{davernas2022} and
+\citet{bertsch2023} provide theoretical models of stablecoin fragility; \citet{liao2022} and \citet{barthelemy2023}
+analyse the growth of stablecoins and their reserve holdings; \citet{bis2025} frame the policy debate around the
+singleness, elasticity and integrity of money. The second literature concerns runs and fire sales more generally.
+Our threshold rule is a reduced form of the global-games equilibrium of \citet{goldstein2005}, in the tradition of
+\citet{diamond1983}, and our fire-sale cost follows \citet{morris2016}, \citet{shleifer2011} and
+\citet{greenwood2015}; the stress-testing use of fire-sale externalities follows \citet{cont2017}. The third
+literature concerns the Treasury market: the price-impact anchor comes from \citet{ahmed2025}, the market-structure
+and March 2020 evidence from \citet{duffie2020}, \citet{vissing2021}, \citet{he2022} and \citet{fleming2003}, and the
+decomposition of impact into permanent and temporary components from \citet{kyle1985} and \citet{almgren2001}, with
+the square-root shape documented by \citet{bouchaud2018}. Methodologically we follow the agent-based tradition
+advocated by \citet{farmer2009} and use one-at-a-time and global sensitivity designs \citep{saltelli2008,morris1991}.
+What is new is the bridge: a calibrated model in which run dynamics, redemption plumbing and bill-market impact are
+in one place, so that the size of the spillover, its channel and the leverage of policy can be computed rather than
+asserted.
+
+\section{Model}\label{sec:model}
+
+Time is discrete in business days $t=1,\dots,T$ with $T=30$. All quantities are vectorised over Monte Carlo
+paths. We describe one issuer; the second issuer (Section~\ref{sec:e4}) is identical with a belief spillover.
+
+\subsection{Holders}
+
+There are $N=10{,}000$ holders of five types $k$: retail, exchanges and market makers, DeFi protocols,
+institutional treasuries and arbitrageurs, with shares of supply $(30, 30, 20, 15, 5)\%$ and holdings drawn
+lognormally within type. Only institutional holders and arbitrageurs have direct access to the issuer. At the
+start of the run the public learns that a share $x$ of reserves is \emph{exposed} (for example, deposits at a
+failed bank). A share $r\in[0,1]$ of the exposure is actually lost; the market assigns probability $\psi$ that an
+unresolved exposure becomes a loss, so the expected loss is $\ell_0 = x\,[r + (1-r)\psi]$ until a resolution day
+$t_R$ on which the public learns the realised loss $xr$. Because the issuer pays at par, the loss falls on whoever
+has not left: the expected loss share of a remaining holder is
+\begin{equation}
+b_t \;=\; \ell_t\, S_0 / S_{t-1},
+\end{equation}
+where $\ell_t$ is the public expected loss as a share of initial supply and $S_t$ is remaining supply. Holder $i$
+observes $b_t$ with a private noise $\varepsilon_i\sim N(0,\sigma^2)$ fixed over the episode, $x_{it}=b_t+\varepsilon_i$,
+and forms an exit signal
+\begin{equation}
+s_{it} \;=\; w_2 x_{it} + w_3 H_t + w_4 \mathbf{1}[\text{suspended}_{t-1}] + \nu_t + w_1 (1-p_{t-1}),
+\label{eq:signal}
+\end{equation}
+where $H_t = \lambda_H H_{t-1} + (\text{exit flow}_t / S_0)$ is a decaying herding state, $\nu_t\sim N(0,\sigma_\nu^2)$
+is a common daily sentiment shock and $p_{t-1}$ is yesterday's secondary price. Holder $i$ pays attention on a given
+day with a type-specific probability $a_k$ and exits if $s_{it}$ exceeds a threshold $\theta_i\sim N(\bar\theta_k,
+\tau_k^2)$. An exited holder re-enters, buying tokens back at the market price, if the \emph{core} signal (the first
+four terms of~(\ref{eq:signal}), without the depeg term) has fallen below $\theta_i - h$: once fundamentals are fine,
+a discount is a buying opportunity rather than a reason to stay away. Direct-access holders who exit join the
+issuer's redemption queue at par; all others sell on the secondary market.
+
+The threshold rule is a reduced form of a global game. In \citet{goldstein2005}, agents with private signals about a
+fundamental coordinate on a unique cutoff; here the cutoffs are heterogeneous by type because redemption access,
+holding size and costs differ, and we calibrate their level rather than derive it. Appendix~\ref{app:benchmark}
+shows that with the herding, depeg and suspension channels switched off and $b_t$ held fixed, the share of supply that
+exits converges exactly to the closed-form aggregate $\sum_k \omega_k \Phi\!\big((x-\bar\theta_k)/\sqrt{\sigma^2+\tau_k^2}\big)$,
+so the simulation nests a transparent benchmark.
+
+\subsection{Secondary market and arbitrage}
+
+Tokens offered on day $t$ are new sales $V_t$ plus the \emph{overhang} $O_{t-1}$ of tokens held by uninformed dip
+buyers who resell. Demand at par from re-entering holders is served first. Arbitrageurs then buy
+\begin{equation}
+B_t \;=\; \min\!\big(V_t + O_{t-1} - \text{re-entry}_t,\; \kappa S_0,\; \max(0,\, h_a c S_0 - Q_{t-1})\big)
+\end{equation}
+if the discount covers the redemption fee plus their cost, where $\kappa$ is daily arbitrage capital as a share of
+supply, $c$ the issuer's daily processing capacity as a share of supply, $h_a$ the number of days of capacity within
+which they require their claim to clear, and $Q$ the redemption queue; a suspended issuer removes the arbitrage bid
+entirely. The remainder stays as overhang and sets the liquidity discount. The secondary price is
+\begin{equation}
+p_t \;=\; \max\Big(1 - \min(b_t, \bar d) - \big[\,c_a \mathbf{1}[\text{offered}>0] + \eta\, O_t/S_0 + \delta\,
+\mathbf{1}[\text{suspended}_t]\big],\; p_{\min}\Big),
+\end{equation}
+a fundamental discount equal to the expected loss share of remaining holders plus an inventory-type liquidity
+discount proportional to the stock of unabsorbed tokens. Arbitrage purchases join the redemption queue at par.
+
+\subsection{Issuer}
+
+Reserves are held in cash and deposits, overnight reverse repo, money market fund shares, bills of at most one
+month ($\text{tb1}$), bills of one to three months ($\text{tb3}$) and other assets. Impairment removes the realised
+loss from the least liquid assets first (other, then cash, then money market fund shares, then repo); bills are never
+impaired. Each day a uniform ladder matures: $\text{tb1}$ runs off into cash over 21 business days and $\text{tb3}$
+rolls into $\text{tb1}$ over 42. The issuer processes $\min(Q_t, cS_0)$ through a waterfall: cash, repo and money
+market fund shares (no price impact), then bills shortest-first at the current price concession, then other assets
+at a 30\% haircut; if the waterfall cannot raise the cash the issuer is \emph{suspended} for the day. Liquidity
+management is explicit: the issuer keeps cash for the pending claims it can pay within $h_c=5$ days and rolls the
+rest of the day's maturities back into bills, so the cash buffer is spent, not rebuilt, during a run. Maturities
+kept as cash are bill demand \emph{withdrawn} at auction. Net asset value marks bills at the current concession.
+A policy switch lets the issuer redeem at net asset value instead of par, in which case the loss is shared pro
+rata and $b_t$ does not grow with redemptions.
+
+\subsection{Bill market}
+
+Let $C_t$ be cumulative net demand withdrawn from the bill market, $C_t = \max(0,\, C_{t-1} + \text{sold}_t +
+\omega\,\text{withdrawn}_t - \text{buys}_t)$, where a share $\rho$ of each day's redemption payments returns to
+bills through money market funds after a lag $L$ (buys), and $\omega$ weights non-rollover relative to a sale.
+Dealer inventory $I_t = (1-\alpha) I_{t-1} + \text{sold}_t - \text{buys}_t$ builds only from outright sales and is
+absorbed by other holders at rate $\alpha$. The three-month yield deviation from its no-run path is
+\begin{equation}
+Y_t \;=\; \underbrace{\lambda_P\, g(C_t)\, m_t}_{\text{persistent}} \;+\; \underbrace{(1-\kappa_T) Y^T_{t-1} +
+\lambda_T\, g(\text{sold}_t)\, m_t}_{\text{temporary}}, \qquad m_t = 1 + (I_{t-1}/K)^{\gamma},
+\label{eq:impact}
+\end{equation}
+with $g(q)=q$ for $q\le q_0$ and $g(q)=\sqrt{q_0 q}$ beyond the anchor flow $q_0=\$3.5\,\bn$ (square-root impact,
+the baseline), or $g(q)=q$ throughout (linear impact, the upper bound). The coefficients are anchored so that a
+\$3.5\,bn outflow raises the three-month yield by about 7\,bp after ten days, the outflow elasticity reported by
+\citet{ahmed2025} (to be verified), with buys acting at a third of that strength. The fire-sale loss on bills sold is
+face value times duration times the yield deviation, with durations of 0.04 and 0.17 years for the two buckets. A
+Fed backstop, when active from day two, removes the dealer-capacity penalty and halves the impact coefficients, a
+stylised Money Market Mutual Fund Liquidity Facility.
+
+\subsection{Timing, outputs and experiments}
+
+Within a day: beliefs and signals update; holders exit or re-enter; exits route to the queue or the secondary market;
+the secondary market clears; the ladder runs off and the issuer processes the queue through the waterfall; the
+issuer manages liquidity; the bill market updates; losses, net asset value and all series are recorded. Each
+scenario is run for 1{,}000 Monte Carlo paths in the baseline and 200--300 in the grids; a path draws thresholds,
+private signals and common shocks, and a run is defined as cumulative redemptions of at least 20\% of initial
+supply by day 30. Five experiments follow the pre-registered design: E1 baseline shocks on Issuer~A, E2 scaling of
+issuer size, E3 a policy grid, E4 contagion to Issuer~B, and E5 sensitivity.

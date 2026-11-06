@@ -1,0 +1,19 @@
+{
+  "title": "stablerun",
+  "upload_type": "software",
+  "description": "Calibrated agent-based model of a payment-stablecoin run and its spillovers to the US Treasury-bill market: heterogeneous holders, a secondary market with capital-constrained arbitrage, an issuer with a redemption queue and a liquidation waterfall, and a bill market with permanent and temporary price impact. Calibrated to the USDC (March 2023) and USDT (May 2022) episodes. Companion software to the working paper \"When Stablecoins Run: Fire-Sale Spillovers to the Treasury Bill Market. An Agent-Based Stress Test\" (https://github.com/thanatchon36/stablerun/raw/main/paper.pdf).",
+  "creators": [
+    {
+      "name": "Chongmankhong, Thanatchon"
+    }
+  ],
+  "license": "mit",
+  "keywords": ["stablecoins", "Treasury bills", "fire sales", "agent-based model", "financial stability", "stress testing"],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/thanatchon36/stablerun/raw/main/paper.pdf",
+      "relation": "isDocumentedBy",
+      "resource_type": "publication-workingpaper"
+    }
+  ]
+}

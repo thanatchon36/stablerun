@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "Please cite the paper (preferred-citation); if you use the stablerun model, also cite the software."
+title: "stablerun: agent-based stress test of stablecoin runs and Treasury-bill fire-sale spillovers"
+abstract: >-
+  Calibrated agent-based model of a payment-stablecoin run: heterogeneous
+  holders, a secondary market with capital-constrained arbitrage, an issuer
+  with a redemption queue and a liquidation waterfall, and a Treasury-bill
+  market with permanent and temporary price impact. Calibrated to the USDC
+  (March 2023) and USDT (May 2022) episodes, with experiments on spillover
+  size, the systemic tipping point, policy levers, contagion and sensitivity.
+type: software
+authors:
+  - family-names: Chongmankhong
+    given-names: Thanatchon
+version: 0.3.0
+date-released: 2026-11-05
+license: MIT
+repository-code: "https://github.com/thanatchon36/stablerun"
+keywords: [stablecoins, treasury-bills, fire-sales, agent-based-model, financial-stability, stress-testing]
+preferred-citation:
+  type: unpublished
+  title: "When Stablecoins Run: Fire-Sale Spillovers to the Treasury Bill Market. An Agent-Based Stress Test"
+  authors:
+    - family-names: Chongmankhong
+      given-names: Thanatchon
+  year: 2026
+  notes: "Working paper, November 2026 draft."
+  url: "https://github.com/thanatchon36/stablerun/raw/main/paper.pdf"

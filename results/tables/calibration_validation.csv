@@ -1,0 +1,6 @@
+episode,target,observed,tolerance,model,z
+usdc_2023,min_price,0.875,0.01,0.9038,2.88
+usdc_2023,R_day5,0.135,0.015,0.12,-1.0
+usdc_2023,R_day22,0.25,0.03,0.24,-0.33
+usdt_2022,min_price,0.96,0.015,0.9255,-2.3
+usdt_2022,R_day10,0.12,0.015,0.12,-0.0

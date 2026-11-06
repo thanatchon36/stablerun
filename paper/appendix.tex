@@ -1,0 +1,85 @@
+\section{Parameter table}\label{app:params}
+
+\begin{table}[H]\centering\footnotesize
+\caption{All model parameters (from \texttt{config/params\_default.yaml}, version 0.3). ``[verify]'' marks
+values taken from memory of public sources that must be checked against the primary document.}\label{tab:params}
+\input{tables/params}
+\end{table}
+
+\section{Pseudo-code}\label{app:pseudo}
+
+\begin{small}
+\begin{enumerate}\setlength{\itemsep}{0pt}
+\item Draw the population once per experiment: types, lognormal holdings within type, access flags, attention rates.
+\item For each chunk of Monte Carlo paths: initialise reserves from the reserve shares; remove the realised loss from
+  other assets, then cash, money market fund shares and repo; draw thresholds $\theta_i$ and private noise
+  $\varepsilon_i$; set price $=1$, overhang, queue, herding state and dealer inventory to zero.
+\item For each business day $t=1,\dots,30$:
+  \begin{enumerate}\setlength{\itemsep}{0pt}
+  \item Public expected loss $\ell_t$ (exposure times the loss probability until the resolution day, realised loss
+    thereafter); belief $b_t=\ell_t S_0/S_{t-1}$ plus any spillover; signals $x_{it}=b_t+\varepsilon_i$; common
+    shock $\nu_t$.
+  \item Exit signal~(\ref{eq:signal}); agents who are awake and above threshold exit; exited agents whose core signal
+    is below $\theta_i-h$ request re-entry.
+  \item Route exits: direct-access holdings to the queue, others to secondary sales $V_t$; update $H_t$.
+  \item Arbitrage capacity from daily capital, queue room within $h_a$ days of processing, suspension and the
+    fee-plus-cost condition; serve re-entry demand, then arbitrage, from $V_t+O_{t-1}$; set the overhang and
+    the price; accepted re-entrants rejoin the population pro rata.
+  \item Queue $+=$ direct requests $+$ arbitrage purchases; ladder run-off ($\text{tb1}\to$ cash,
+    $\text{tb3}\to\text{tb1}$); demand $=\min(Q_t, cS_0)$ (zero on blackout days); waterfall raises
+    demand $\times$ payout (par or net asset value, net of fee); shortfall $\Rightarrow$ suspended; supply and queue fall
+    by the tokens paid.
+  \item Liquidity management: hoard $=\min(Q_t, h_c\, cS_0)$; reinvest $\min(\text{matured}, \max(0,\text{cash}-\text{hoard}))$
+    into $\text{tb1}$; withdrawn $=$ matured $-$ reinvested.
+  \item Bill market~(\ref{eq:impact}) with sold, withdrawn and the lagged reinvestment buys $\rho\cdot\text{paid}_{t-L}$;
+    fire-sale loss; mark-to-market net asset value; record all series.
+  \end{enumerate}
+\item Metrics per path (minimum price, redemptions at days 7 and 30, peak impact, bills sold, demand withdrawn,
+  suspension days, losses, net asset value) and summaries across paths (medians, 5th and 95th percentiles, run
+  probabilities, threshold exceedance probabilities).
+\end{enumerate}
+\end{small}
+
+\section{Analytic benchmark}\label{app:benchmark}
+
+Consider a continuum of holders of type $k$ with supply shares $\omega_k$, a publicly known loss share $x$ of
+reserves that does not change with redemptions, private signals $x_i = x+\varepsilon_i$ with $\varepsilon_i\sim
+N(0,\sigma^2)$ and exit cutoffs $\theta_i\sim N(\bar\theta_k,\tau_k^2)$. In the limit without herding, depeg and
+suspension channels, holder $i$ exits within the horizon if $x+\varepsilon_i>\theta_i$, so the share of supply that
+exits is
+\begin{equation}
+E(x) \;=\; \sum_k \omega_k\, \Phi\!\left(\frac{x-\bar\theta_k}{\sqrt{\sigma^2+\tau_k^2}}\right).
+\end{equation}
+In a global game with a fire-sale liquidation cost $c(n)$ increasing in the exiting mass $n$, as in
+\citet{goldstein2005} and \citet{morris2016}, the equilibrium cutoff $\theta^*$ falls as the liquidation cost
+rises, $\partial\theta^*/\partial c<0$: a costlier fire sale makes the run start at a smaller loss. In our model the
+fire-sale cost on bills is tiny because bill duration is tiny, so this amplification is absent and the cutoffs are
+calibrated rather than derived. Table~\ref{tab:benchmark} and Figure~\ref{fig:f6} compare the simulated exit share
+with $E(x)$ when $w_1=w_3=w_4=0$, $\sigma_\nu=0$ and the belief is held fixed: the two agree to within a tenth of a
+percentage point.
+
+\begin{table}[H]\centering\small
+\caption{Benchmark check: share of supply exiting within 30 days (100 paths) against the closed-form aggregate.}
+\label{tab:benchmark}
+\input{tables/benchmark}
+\end{table}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.55\textwidth]{F6_benchmark_check}
+\caption{Benchmark check: simulated exit share with the behavioural channels off against the closed-form threshold
+aggregate.}\label{fig:f6}
+\end{figure}
+
+\section{Additional results}\label{app:extra}
+
+\begin{table}[H]\centering\small
+\caption{E1 baseline for Issuer~B (1{,}000 paths). Same scenarios as Table~\ref{tab:e1}; Issuer~B has no cushion of
+other assets, so a realised loss hits deposits and the reserve fund directly, and its processing capacity is 3\% of
+supply per day.}\label{tab:e1B}
+\resizebox{\textwidth}{!}{\input{tables/e1_B}}
+\end{table}
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{F1_B_baseline_dynamics}
+\caption{Baseline run dynamics for Issuer~B (1{,}000 paths), panels as in Figure~\ref{fig:f1}.}\label{fig:f1b}
+\end{figure}

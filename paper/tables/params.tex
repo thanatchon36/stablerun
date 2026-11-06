@@ -1,0 +1,36 @@
+\begin{tabular}{p{6.9cm}p{4.5cm}p{3.2cm}}
+\toprule
+Parameter & Value & Source \\
+\midrule
+Issuer A supply, \$bn & 180 & attestation, mid-2026 [verify] \\
+Issuer B supply, \$bn & 75 & attestation, mid-2026 [verify] \\
+A reserves: cash / repo / MMF / bills $\leq$1M / 1--3M / other & 0.5\% / 10.0\% / 4.0\% / 33.0\% / 33.0\% / 19.5\% & attestation [verify] \\
+B reserves: cash / repo / MMF / bills $\leq$1M / 1--3M / other & 12.0\% / 48.0\% / 0.0\% / 25.0\% / 15.0\% / 0.0\% & reserve report, look-through [verify] \\
+Other-asset fire-sale haircut & 30\% & assumption \\
+Bill ladder (tb1 / tb3 days) & 21 / 42 & assumption \\
+Processing capacity, A / B (share of supply per day) & 1.2\% / 3.0\% & calibrated \\
+Arbitrage capital, A / B (share of supply per day) & 1.1\% / 3.0\% & calibrated \\
+Redemption fee, A / B & 0.1\% / 0.0\% & issuer terms [verify] \\
+Cash hoarding horizon, days & 5 & assumption \\
+Impact anchor flow, \$bn & 3.5 & Ahmed--Aldasoro [verify] \\
+Persistent / temporary sell impact, bp per \$bn at anchor & 2.0 / 1.0 & Ahmed--Aldasoro outflow range [verify] \\
+Buy impact, bp per \$bn & 0.5 & asymmetry [verify] \\
+Temporary impact decay per day & 0.3 & assumption \\
+Impact shape & sqrt (linear below anchor) & square-root law \\
+Dealer capacity $K$, \$bn / convexity $\gamma$ / absorption per day & 150 / 2.0 / 0.1 & assumption \\
+MMF reinvestment share $\rho$ / lag, days & 0.5 / 2 & assumption \\
+Bill durations sold, years (tb1 / tb3) & 0.04 / 0.17 & bucket midpoints \\
+Agents $N$ & 10,000 & design \\
+Holder type shares of supply (retail / exch. / DeFi / inst. / arb.) & 30\% / 30\% / 20\% / 15\% / 5\% & assumption \\
+Attention probabilities per day & 0.25 / 0.70 / 0.40 / 0.50 / 1.00 & assumption \\
+Exit threshold means & 0.12 / 0.08 / 0.10 / 0.07 / 0.03 & calibrated (scale 1.0) \\
+Exit threshold s.d. & 0.04 / 0.03 / 0.03 / 0.02 / 0.01 & assumption \\
+Signal weights $w_1, w_2, w_3, w_4$ & 0.5, 1.0, 0.3, 0.2 & calibrated / assumption \\
+Private-signal s.d. / common shock s.d. & 0.02 / 0.005 & assumption \\
+Herding memory / re-entry hysteresis & 0.6 / 0.02 & assumption \\
+Loss probability $\psi$ & 1.0 & calibrated \\
+Liquidity depth $\eta$ / arbitrage cost / horizon, days & 0.1 / 0.002 / 2 & calibrated / assumption \\
+Suspension discount / price floor & 0.05 / 0.5 & assumption \\
+Belief spillover $\beta$ (E4) & 0, 0.3, 0.6 & assumption \\
+\bottomrule
+\end{tabular}

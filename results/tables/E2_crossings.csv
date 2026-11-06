@@ -1,0 +1,13 @@
+scenario,impact,rails,size_10bp,size_25bp,size_50bp
+loss10,linear,calibrated,<1x,<1x,<1x
+loss10,linear,fast,<1x,<1x,1.1x
+loss10,linear,instant,<1x,<1x,<1x
+loss10,sqrt,calibrated,<1x,1.4x,5.5x
+loss10,sqrt,fast,<1x,1.9x,7.5x
+loss10,sqrt,instant,<1x,1.7x,6.7x
+scare,linear,calibrated,<1x,<1x,1.1x
+scare,linear,fast,1.8x,4.4x,8.8x
+scare,linear,instant,1.1x,2.6x,5.3x
+scare,sqrt,calibrated,<1x,2.0x,8.1x
+scare,sqrt,fast,2.5x,>10x,>10x
+scare,sqrt,instant,1.3x,7.4x,>10x
